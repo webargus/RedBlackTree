@@ -24,8 +24,10 @@ class BinaryTreePanel:
                             "padx": 4})
         l1.grid({"row": 0, "column": 0})
 
-        form = Frame(wrap, {"pady": 4, "padx": 8})
-        form.grid({"row": 1, "column": 0, "sticky": NSEW, "pady": 8, "padx": 8})
+        frame_adding = LabelFrame(wrap, text=" Adding ")
+        frame_adding.grid({"row": 1, "column": 0, "sticky": NSEW, "pady": 8, "padx":8})
+        form = Frame(frame_adding, {"pady": 4, "padx": 8})
+        form.grid({"row": 0, "column": 0, "sticky": NSEW, "pady": 8, "padx": 8})
         # form.grid_columnconfigure(0, weight=1)
 
         Label(form, text="Value:", font=("Arial", 10)).grid(row=0, column=0, sticky=W)
@@ -34,8 +36,24 @@ class BinaryTreePanel:
         self.node_value_entry.grid(row=0, column=1, sticky=W)
         self.node_add_btn = Button(form, text="Add", font=("Arial", 10), width=5, command=self._add_node)
         self.node_add_btn.grid(row=0, column=2, sticky=W)
-        self.clear_tree_btn = Button(form, text="Clear", font=("Arial", 10), width=5, command=self._clear_tree)
-        self.clear_tree_btn.grid(row=0, column=3, sticky=W)
+        # add frame and blank label just to create left margin before undo and clear btns
+        spacer = Frame(form)
+        spacer.grid(row=0, column=3, sticky=W)
+        Label(spacer, text=" "*20).grid(row=0, column=0)
+
+        self.undo_last_btn = Button(form,
+                                    text="Undo",
+                                    font=("Arial", 10),
+                                    width=5,
+                                    command=self._undo_last)
+        self.undo_last_btn.grid(row=0, column=4, sticky=E)
+
+        self.clear_tree_btn = Button(form,
+                                     text="Clear",
+                                     font=("Arial", 10),
+                                     width=5,
+                                     command=self._clear_tree)
+        self.clear_tree_btn.grid(row=0, column=5, sticky=E)
 
         canvasF = Frame(wrap, {"relief": SUNKEN, "border": 1})
         canvasF.grid({"pady": 8, "padx": 8, "row": 2, "column": 0, "sticky": NSEW})
@@ -55,6 +73,7 @@ class BinaryTreePanel:
     def _clear_tree(self):
         self.canvas.clear()
 
-
+    def _undo_last(self):
+        pass
 
 

@@ -68,13 +68,19 @@ class BinaryTree:
             else:
                 self._add(n, node)
 
-    def breadth_first_search(self, node, callback):
+    def in_order_tree_walk(self, node, callback):
+        if node is None:
+            return
+        self.in_order_tree_walk(node.get_left(), callback)
+        callback(node)              # do something with node
+        self.in_order_tree_walk(node.get_right(), callback)
+
+    def pre_order_tree_walk(self, node, callback):
         if node is None:
             return
         callback(node)
-
-        self.breadth_first_search(node.get_left(), callback)
-        self.breadth_first_search(node.get_right(), callback)
+        self.pre_order_tree_walk(node.get_left(), callback)
+        self.pre_order_tree_walk(node.get_right(), callback)
 
     def get_node_height(self, node):
         if node is None:

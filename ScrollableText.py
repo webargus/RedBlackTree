@@ -22,9 +22,13 @@ class ScrollableText(Text):
         vscroll = ttk.Scrollbar(frame, orient=VERTICAL, command=self.yview)
         vscroll.grid({"row": 0, "column": 1, "sticky": NS})
         self.configure(yscrollcommand=vscroll.set)
+        # add horizontal scrollbar
+        hscroll = ttk.Scrollbar(frame, orient=HORIZONTAL, command=self.xview)
+        hscroll.grid(row=1, column=0, sticky=EW)
+        self.configure(xscrollcommand=hscroll.set, wrap=NONE)
         #   configure font for text
         self.tag_configure("font", font=('Arial', 10))
-        #   make widget non-editable without disabling int
+        #   make widget non-editable without disabling it
         self.bind("<Key>", lambda e: "break")
 
     def append_text(self, text):
