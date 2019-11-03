@@ -22,14 +22,34 @@ class BinaryTreeCanvas:
         tags = self.canvas.gettags(item)
         if (len(tags) > 1) and (tags[0] == "node"):
             node = self.tree.search(int(tags[1]), self.tree.root)
-            self.canvas.coords(self.sel_rect,
-                               (node.x-1.5*CanvasTreeNode.NODE_RADIUS,
-                                node.y-1.5*CanvasTreeNode.NODE_RADIUS,
-                                node.x+1.5*CanvasTreeNode.NODE_RADIUS,
-                                node.y+1.5*CanvasTreeNode.NODE_RADIUS))
-            self.canvas.itemconfigure(self.sel_rect, state="normal")
+            self._select_node(node)
             txt = "Search for key %s returned node [%s]" % (tags[1], str(node))
             self.callback(txt, True)
+
+    def maximum(self):
+        max_node = self.tree.maximum()
+        if max_node is None:
+            self.callback("There is no maximum BST key")
+        else:
+            self._select_node(max_node)
+            self.callback("Maximum BST key: %d" % max_node.get_key(), True)
+
+    def minimum(self):
+        min_node = self.tree.minimum()
+        if min_node is None:
+            self.callback("There is no minimum BST key")
+        else:
+            self._select_node(min_node)
+            self.callback("Minimum BST key: %d" % min_node.get_key(), True)
+
+    def _select_node(self, node):
+        self.canvas.coords(self.sel_rect,
+                           (node.x - 1.5 * CanvasTreeNode.NODE_RADIUS,
+                            node.y - 1.5 * CanvasTreeNode.NODE_RADIUS,
+                            node.x + 1.5 * CanvasTreeNode.NODE_RADIUS,
+                            node.y + 1.5 * CanvasTreeNode.NODE_RADIUS))
+
+        self.canvas.itemconfigure(self.sel_rect, state="normal")
 
     def add_node(self, value):
         self.tree.add(CanvasTreeNode(value))
@@ -61,7 +81,7 @@ class BinaryTreeCanvas:
     def _draw_node(self, node, x, y):
         key = node.get_key()
 
-        circle = self.canvas.create_oval(x - CanvasTreeNode.NODE_RADIUS,
+        self.canvas.create_oval(x - CanvasTreeNode.NODE_RADIUS,
                                 y - CanvasTreeNode.NODE_RADIUS,
                                 x + CanvasTreeNode.NODE_RADIUS,
                                 y + CanvasTreeNode.NODE_RADIUS,

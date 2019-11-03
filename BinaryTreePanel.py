@@ -36,25 +36,54 @@ class BinaryTreePanel:
         self.node_value_entry.grid(row=0, column=1, sticky=W)
         self.node_add_btn = Button(form, text="Insert", font=("Arial", 10), width=5, command=self._add_node)
         self.node_add_btn.grid(row=0, column=2, sticky=W)
-        # add frame and blank label just to create left margin before undo and clear btns
+
+        self.max_button = Button(form,
+                                   text="Maximum",
+                                   font=("Arial", 10),
+                                   width=8,
+                                   command=self._maximum)
+        self.max_button.grid(row=0, column=3, sticky=E)
+
+        self.minimum_btn = Button(form,
+                                   text="Minimum",
+                                   font=("Arial", 10),
+                                   width=8,
+                                   command=self._minimum)
+        self.minimum_btn.grid(row=0, column=4, sticky=E)
+
+        self.successor_btn = Button(form,
+                                   text="Successor",
+                                   font=("Arial", 10),
+                                   width=8,
+                                   command=self._successor)
+        self.successor_btn.grid(row=0, column=5, sticky=E)
+
+        self.predecessor_btn = Button(form,
+                                   text="Predecessor",
+                                   font=("Arial", 10),
+                                   width=8,
+                                   command=self._predecessor)
+        self.predecessor_btn.grid(row=0, column=6, sticky=E)
+
+        # add frame and blank label just to create left margin before delete and clear btns
         spacer = Frame(form)
-        spacer.grid(row=0, column=3, sticky=W)
+        spacer.grid(row=0, column=7, sticky=W)
         Label(spacer, text=" "*20).grid(row=0, column=0)
 
         self.del_node_btn = Button(form,
                                    text="Delete",
                                    font=("Arial", 10),
-                                   width=5,
+                                   width=8,
                                    state="disabled",
                                    command=self._delete)
-        self.del_node_btn.grid(row=0, column=4, sticky=E)
+        self.del_node_btn.grid(row=0, column=8, sticky=E)
 
         self.clear_tree_btn = Button(form,
                                      text="Clear",
                                      font=("Arial", 10),
-                                     width=5,
+                                     width=8,
                                      command=self._clear_tree)
-        self.clear_tree_btn.grid(row=0, column=5, sticky=E)
+        self.clear_tree_btn.grid(row=0, column=9, sticky=E)
 
         fb_frame = Frame(wrap, height=50)
         fb_frame.grid(row=2, column=0, sticky=EW, pady=4)
@@ -79,11 +108,34 @@ class BinaryTreePanel:
             return
         self.canvas.add_node(value)
         self._feedback("Click on node to call BST search for node key")
+        self._enable_btn(self.max_button)
+        self._enable_btn(self.minimum_btn)
+        self._enable_btn(self.clear_tree_btn)
+        self._enable_btn(self.predecessor_btn, False)
+        self._enable_btn(self.successor_btn, False)
+        self._enable_btn(self.del_node_btn, False)
 
     def _clear_tree(self):
         self.canvas.clear_tree()
         self._feedback("Insert a node into BST")
-        self.del_node_btn.configure(state="disabled")
+        self._enable_btn(self.minimum_btn, False)
+        self._enable_btn(self.max_button, False)
+        self._enable_btn(self.predecessor_btn, False)
+        self._enable_btn(self.successor_btn, False)
+        self._enable_btn(self.del_node_btn, False)
+        self._enable_btn(self.clear_tree_btn, False)
+
+    def _maximum(self):
+        self.canvas.maximum()
+
+    def _minimum(self):
+        self.canvas.minimum()
+
+    def _successor(self):
+        pass
+
+    def _predecessor(self):
+        pass
 
     def _delete(self):
         self.del_node_btn.configure(state="disabled")
@@ -92,9 +144,15 @@ class BinaryTreePanel:
     def _feedback(self, msg, sel=False):
         self.feedback.set(msg)
         if sel:
-            self.del_node_btn.configure(state="normal")
+            self._enable_btn(self.del_node_btn)
+            self._enable_btn(self.successor_btn)
+            self._enable_btn(self.predecessor_btn)
 
-
+    def _enable_btn(self, btn, en=True):
+        if en:
+            btn.configure(state="normal")
+        else:
+            btn.configure(state="disabled")
 
 
 
