@@ -60,7 +60,6 @@ class Gui(Frame):
 
         BinaryTreePanel.BinaryTreePanel(self.nb_files[0][1])
 
-
         self.mainloop()
 
     def _tab_switch(self, event):

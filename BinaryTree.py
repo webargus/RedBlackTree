@@ -1,18 +1,17 @@
 
-from collections import deque
 import math
 
 
 class TreeNode:
 
-    def __init__(self, value, parent=None, left=None, right=None):
-        self.value = value
+    def __init__(self, key, parent=None, left=None, right=None):
+        self.key = key
         self.left = left
         self.right = right
         self.parent = parent
 
-    def get_value(self):
-        return self.value
+    def get_key(self):
+        return self.key
 
     def get_left(self):
         return self.left
@@ -53,7 +52,7 @@ class BinaryTree:
 
     # @parent = node where we want to insert @node
     def _add(self, parent, node):
-        if parent.get_value() > node.value:
+        if parent.get_key() > node.key:
             n = parent.get_left()
             if n is None:
                 parent.set_left(node)
@@ -81,6 +80,17 @@ class BinaryTree:
         callback(node)
         self.pre_order_tree_walk(node.get_left(), callback)
         self.pre_order_tree_walk(node.get_right(), callback)
+
+    def search(self, key, node):
+        if node is None:
+            return node
+        k = node.get_key()
+        if key == k:
+            return node
+        elif key < k:
+            return self.search(key, node.get_left())
+        else:
+            return self.search(key, node.get_right())
 
     def get_node_height(self, node):
         if node is None:
