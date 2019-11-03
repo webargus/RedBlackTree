@@ -19,7 +19,10 @@ class Gui(Frame):
         self.master.tk.call('wm', 'iconphoto', self.master._w, self.imgicon)
 
         self.master.resizable(False, False)
-        self.master.attributes("-zoomed", True)
+        if sys.platform == 'win32':
+            self.master.state("zoomed")
+        else:
+            self.master.attributes("-zoomed", True)
         self.master.title("Algorithms and Data Structures' - SI2019.2")
         self.master.grid_rowconfigure(0, weight=1)
         self.master.grid_columnconfigure(0, weight=1)
