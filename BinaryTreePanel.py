@@ -132,7 +132,7 @@ class BinaryTreePanel:
         self.canvas.minimum()
 
     def _successor(self):
-        pass
+        self.canvas.successor()
 
     def _predecessor(self):
         pass
@@ -143,7 +143,7 @@ class BinaryTreePanel:
 
     def _feedback(self, msg, sel=False):
         self.feedback.set(msg)
-        if sel:
+        if sel:                                 # user selected some node in GUI
             self._enable_btn(self.del_node_btn)
             self._enable_btn(self.successor_btn)
             self._enable_btn(self.predecessor_btn)

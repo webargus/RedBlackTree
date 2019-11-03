@@ -15,7 +15,7 @@ class BinaryTreeCanvas:
         hscroll.grid(row=1, column=0, sticky=EW)
         self.canvas.configure(xscrollcommand=hscroll.set)
 
-        self.sel_rect = self.tree = None
+        self.selected = self.sel_rect = self.tree = None
 
     def _handle_click(self, event):
         item = self.canvas.find_withtag("current")
@@ -27,7 +27,7 @@ class BinaryTreeCanvas:
             self.callback(txt, True)
 
     def maximum(self):
-        max_node = self.tree.maximum()
+        max_node = self.tree.maximum(self.tree.root)
         if max_node is None:
             self.callback("There is no maximum BST key")
         else:
@@ -35,12 +35,23 @@ class BinaryTreeCanvas:
             self.callback("Maximum BST key: %d" % max_node.get_key(), True)
 
     def minimum(self):
-        min_node = self.tree.minimum()
+        min_node = self.tree.minimum(self.tree.root)
         if min_node is None:
             self.callback("There is no minimum BST key")
         else:
             self._select_node(min_node)
             self.callback("Minimum BST key: %d" % min_node.get_key(), True)
+
+    def successor(self):
+        node = self.selected
+        if node is None:
+            return
+        successor = self.tree.successor(node)
+        k = node.get_key()
+        if successor is None:
+            self.callback("There is no successor for %d, i.e., %d is the BST maximum" % (k, k))
+        else:
+            self.callback("The successor of %d is %d" % (k, successor.get_key()))
 
     def _select_node(self, node):
         self.canvas.coords(self.sel_rect,
@@ -50,6 +61,7 @@ class BinaryTreeCanvas:
                             node.y + 1.5 * CanvasTreeNode.NODE_RADIUS))
 
         self.canvas.itemconfigure(self.sel_rect, state="normal")
+        self.selected = node
 
     def add_node(self, value):
         self.tree.add(CanvasTreeNode(value))
@@ -118,6 +130,7 @@ class BinaryTreeCanvas:
 
     def clear_tree(self):
         self.tree = BinaryTree.BinaryTree()
+        self.selected = None
         self.clear()
 
 

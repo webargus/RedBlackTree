@@ -92,19 +92,30 @@ class BinaryTree:
         else:
             return self.search(key, node.get_right())
 
-    def maximum(self):
-        ret = node = self.root
+    # return maximum of subtree starting at @node
+    def maximum(self, node):
         while node is not None:
             ret = node
             node = node.get_right()
         return ret
 
-    def minimum(self):
-        ret = node = self.root
+    # return minimum of subtree starting at @node
+    def minimum(self, node):
         while node is not None:
             ret = node
             node = node.get_left()
         return ret
+
+    # return successor of @node
+    def successor(self, node):
+        n = node.get_right()
+        if n is not None:
+            return self.minimum(n)
+        n = node.get_parent()
+        while (n is not None) and (n.get_right() == node):
+            node = n
+            n = node.get_parent()
+        return n
 
     def get_node_height(self, node):
         if node is None:
