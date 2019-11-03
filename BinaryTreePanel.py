@@ -135,7 +135,7 @@ class BinaryTreePanel:
         self.canvas.successor()
 
     def _predecessor(self):
-        pass
+        self.canvas.predecessor()
 
     def _delete(self):
         self.del_node_btn.configure(state="disabled")

@@ -53,6 +53,18 @@ class BinaryTreeCanvas:
         else:
             self.callback("The successor of %d is %d" % (k, successor.get_key()))
 
+    def predecessor(self):
+        node = self.selected
+        if node is None:
+            return
+        predecessor = self.tree.predecessor(node)
+        k = node.get_key()
+        if predecessor is None:
+            self.callback("There is no predecessor for %d, i.e., %d is the BST minimum" % (k, k))
+        else:
+            self.callback("The predecessor of %d is %d" % (k, predecessor.get_key()))
+
+
     def _select_node(self, node):
         self.canvas.coords(self.sel_rect,
                            (node.x - 1.5 * CanvasTreeNode.NODE_RADIUS,

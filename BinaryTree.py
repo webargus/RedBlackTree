@@ -108,11 +108,28 @@ class BinaryTree:
 
     # return successor of @node
     def successor(self, node):
+        # just get the minimum of right subtree of node, if there is a right subtree
         n = node.get_right()
         if n is not None:
             return self.minimum(n)
+        # go up towards root otherwise, until we find a parent node
+        # having a different right branch from current node
         n = node.get_parent()
         while (n is not None) and (n.get_right() == node):
+            node = n
+            n = node.get_parent()
+        return n
+
+    # return de predecessor of @node
+    def predecessor(self, node):
+        # just get the maximum of left subtree of node, if there is a left subtree
+        n = node.get_left()
+        if n is not None:
+            return self.maximum(n)
+        # go up towards BST root otherwise, until we find a parent node
+        # having a different left branch from current node
+        n = node.get_parent()
+        while (n is not None) and (n.get_left() == node):
             node = n
             n = node.get_parent()
         return n
