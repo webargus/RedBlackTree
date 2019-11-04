@@ -41,7 +41,7 @@ class BinaryTree:
         self.root = None
         self.n = 0
 
-    def get_depth(self):
+    def get_tree_height(self):
         if self.n == 0:
             return 0
         return math.ceil(math.log2(self.n))
@@ -55,7 +55,9 @@ class BinaryTree:
 
     # @parent = node where we want to insert @node
     def _add(self, parent, node):
-        if parent.get_key() > node.key:
+        if parent.get_key() == node.key:
+            raise ValueError
+        elif parent.get_key() > node.key:
             n = parent.get_left()
             if n is None:
                 parent.set_left(node)
@@ -160,36 +162,14 @@ class BinaryTree:
             w.set_right(x)
         if y != node:
             node.set_key(y.get_key())
+        self.n -= 1
         return y
-
-
-
-
-
-
-
-
-
-
-
-
 
     def get_node_height(self, node):
         if node is None:
             return 0
         else:
             return max(self.get_node_height(node.get_left()), self.get_node_height(node.get_right())) + 1
-
-
-
-
-
-
-
-
-
-
-
 
 
 

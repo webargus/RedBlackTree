@@ -82,9 +82,14 @@ class BinaryTreeCanvas:
         self.canvas.itemconfigure(self.sel_rect, state="normal")
         self.selected = node
 
-    def add_node(self, value):
-        self.tree.add(CanvasTreeNode(value))
+    def add_node(self, key):
+        try:
+            self.tree.add(CanvasTreeNode(key))
+        except ValueError:
+            self.callback("Insertion failed: key %d already exists" % key)
+            return
         self._redraw_tree()
+        self.callback("Click on a node to call BST search for node key")
 
     def _redraw_tree(self):
         self.clear()
@@ -155,6 +160,9 @@ class BinaryTreeCanvas:
     def clear_tree(self):
         self.tree = BinaryTree.BinaryTree()
         self.clear()
+
+    def is_empty(self):
+        return (self.tree is None) or (self.tree.n == 0)
 
 
 class CanvasTreeNode(BinaryTree.TreeNode):

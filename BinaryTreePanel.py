@@ -107,7 +107,9 @@ class BinaryTreePanel:
             messagebox.showerror("Invalid input", "Please, enter integers only")
             return
         self.canvas.add_node(value)
-        self._feedback("Click on node to call BST search for node key")
+        self._disable_sel_btns()
+
+    def _disable_sel_btns(self):
         self._enable_btn(self.max_button)
         self._enable_btn(self.minimum_btn)
         self._enable_btn(self.clear_tree_btn)
@@ -117,7 +119,7 @@ class BinaryTreePanel:
 
     def _clear_tree(self):
         self.canvas.clear_tree()
-        self._feedback("Insert a node into BST")
+        self._feedback("Insert a root node into BST")
         self._enable_btn(self.minimum_btn, False)
         self._enable_btn(self.max_button, False)
         self._enable_btn(self.predecessor_btn, False)
@@ -139,6 +141,10 @@ class BinaryTreePanel:
 
     def _delete(self):
         self.canvas.delete()
+        if self.canvas.is_empty():
+            self._clear_tree()
+        else:
+            self._disable_sel_btns()
 
     def _feedback(self, msg, sel=False):
         self.feedback.set(msg)
