@@ -64,6 +64,13 @@ class BinaryTreeCanvas:
         else:
             self.callback("The predecessor of %d is %d" % (k, predecessor.get_key()))
 
+    def delete(self):
+        node = self.selected
+        if node is None:
+            return
+        self.callback("Deleting node %s..." % str(node))
+        y = self.tree.delete(node)
+        self._redraw_tree()
 
     def _select_node(self, node):
         self.canvas.coords(self.sel_rect,
@@ -77,6 +84,9 @@ class BinaryTreeCanvas:
 
     def add_node(self, value):
         self.tree.add(CanvasTreeNode(value))
+        self._redraw_tree()
+
+    def _redraw_tree(self):
         self.clear()
         self.tree.pre_order_tree_walk(self.tree.root, self.draw_tree)
 
@@ -139,10 +149,11 @@ class BinaryTreeCanvas:
         # create selection rect
         self.sel_rect = self.canvas.create_rectangle(0, 0, 0, 0, outline="blue", width=2)
         self.canvas.itemconfigure(self.sel_rect, state="hidden")
+        # reset node selection
+        self.selected = None
 
     def clear_tree(self):
         self.tree = BinaryTree.BinaryTree()
-        self.selected = None
         self.clear()
 
 

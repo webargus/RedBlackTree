@@ -10,6 +10,9 @@ class TreeNode:
         self.right = right
         self.parent = parent
 
+    def set_key(self, key):
+        self.key = key
+
     def get_key(self):
         return self.key
 
@@ -133,6 +136,43 @@ class BinaryTree:
             node = n
             n = node.get_parent()
         return n
+
+    def delete(self, node):
+        left = node.get_left()
+        right = node.get_right()
+        if (left is None) or (right is None):
+            y = node
+        else:
+            y = self.successor(node)
+        w = y.get_left()
+        if w is not None:
+            x = w
+        else:
+            x = y.get_right()
+        w = y.get_parent()
+        if x is not None:
+            x.set_parent(w)
+        if w is None:
+            self.root = x
+        elif y == w.get_left():
+            w.set_left(x)
+        else:
+            w.set_right(x)
+        if y != node:
+            node.set_key(y.get_key())
+        return y
+
+
+
+
+
+
+
+
+
+
+
+
 
     def get_node_height(self, node):
         if node is None:

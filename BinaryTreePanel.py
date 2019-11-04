@@ -138,8 +138,7 @@ class BinaryTreePanel:
         self.canvas.predecessor()
 
     def _delete(self):
-        self.del_node_btn.configure(state="disabled")
-        pass
+        self.canvas.delete()
 
     def _feedback(self, msg, sel=False):
         self.feedback.set(msg)
