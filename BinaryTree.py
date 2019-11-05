@@ -183,6 +183,24 @@ class BinaryTree:
         return self.check_tree_balance(node.get_left())
         return self.check_tree_balance(node.get_right())
 
+    def rotate_left(self, node):
+        y = node.get_right()
+        node.set_right(y.get_left())
+        if y.get_left() is not None:
+            y.get_left().set_parent(node)
+        y.set_parent(node.get_parent())
+        if node.get_parent() is None:
+            self.root = y
+        elif node == node.get_parent().get_left():
+            node.get_parent().set_left(y)
+        else:
+            node.get_parent().set_right(y)
+        y.set_left(node)
+        node.set_parent(y)
+
+    def rotate_right(self, node):
+        pass
+
 
 
 

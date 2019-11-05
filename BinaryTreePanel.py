@@ -116,12 +116,17 @@ class BinaryTreePanel:
 
     def _add_node(self):
         try:
-            value = int(self.node_value.get())
+            key = int(self.node_value.get())
         except ValueError:
             messagebox.showerror("Invalid input", "Please, enter integers only")
             return
-        self.canvas.add_node(value)
-        self._disable_sel_btns()
+        if self.canvas.add_node(key):
+            self._disable_sel_btns()
+        else:
+            self._disable_all_btns()
+            self._enable_btn(self.balance_btn)
+            self._enable_btn(self.clear_tree_btn)
+            self._enable_btn(self.node_add_btn, False)
 
     def _disable_sel_btns(self):
         self._enable_btn(self.max_button)
@@ -131,15 +136,19 @@ class BinaryTreePanel:
         self._enable_btn(self.successor_btn, False)
         self._enable_btn(self.del_node_btn, False)
 
-    def _clear_tree(self):
-        self.canvas.clear_tree()
-        self._feedback("Insert a root node into BST")
+    def _disable_all_btns(self):
         self._enable_btn(self.minimum_btn, False)
         self._enable_btn(self.max_button, False)
         self._enable_btn(self.predecessor_btn, False)
         self._enable_btn(self.successor_btn, False)
         self._enable_btn(self.del_node_btn, False)
         self._enable_btn(self.clear_tree_btn, False)
+        self._enable_btn(self.balance_btn, False)
+
+    def _clear_tree(self):
+        self.canvas.clear_tree()
+        self._feedback("Insert a root node into BST")
+        self._disable_all_btns()
 
     def _maximum(self):
         self.canvas.maximum()
@@ -154,14 +163,25 @@ class BinaryTreePanel:
         self.canvas.predecessor()
 
     def _delete(self):
-        self.canvas.delete()
-        if self.canvas.is_empty():
-            self._clear_tree()
+        if self.canvas.delete():
+            if self.canvas.is_empty():
+                self._clear_tree()
+            else:
+                self._disable_sel_btns()
         else:
-            self._disable_sel_btns()
+            self._disable_all_btns()
+            self._enable_btn(self.balance_btn)
+            self._enable_btn(self.clear_tree_btn)
+            self._enable_btn(self.node_add_btn, False)
 
     def _balance_tree(self):
-        pass
+        self.canvas.balance_tree()
+        self._enable_btn(self.node_add_btn)
+        self._enable_btn(self.balance_btn, False)
+        if self.canvas.is_empty():
+            self._disable_all_btns()
+        else:
+            self._disable_sel_btns()
 
     def _feedback(self, msg, sel=False):
         self.feedback.set(msg)

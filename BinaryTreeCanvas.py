@@ -15,9 +15,13 @@ class BinaryTreeCanvas:
         hscroll.grid(row=1, column=0, sticky=EW)
         self.canvas.configure(xscrollcommand=hscroll.set)
 
-        self.selected = self.sel_rect = self.tree = None
+        self.selected = self.sel_rect = self.tree = self.unbalanced = None
+        self.balance_factor = 0
+        self.click_lock = False
 
     def _handle_click(self, event):
+        if self.click_lock:
+            return
         item = self.canvas.find_withtag("current")
         tags = self.canvas.gettags(item)
         if (len(tags) > 1) and (tags[0] == "node"):
@@ -68,10 +72,12 @@ class BinaryTreeCanvas:
         node = self.selected
         if node is None:
             return
-        self.callback("Deleting node %s..." % str(node))
-        y = self.tree.delete(node)
+        self.tree.delete(node)
         self._redraw_tree()
-        self.balance_tree()
+        ret = self._check_tree_balance()
+        if ret:
+            self.callback("Deleted node [%s]" % str(node))
+        return ret
 
     def _select_node(self, node):
         self.canvas.coords(self.sel_rect,
@@ -88,42 +94,30 @@ class BinaryTreeCanvas:
             self.tree.add(CanvasTreeNode(key))
         except ValueError:
             self.callback("Insertion failed: key %d already exists" % key)
-            return
+            return True
         self._redraw_tree()
-        self.callback("Click on a node to call BST search for node key")
-        self.balance_tree()
+        ret = self._check_tree_balance()
+        if ret:
+            self.callback("Click on a node to call BST search for node key")
+        return ret
+
+    def _check_tree_balance(self):
+        self.unbalanced, self.balance_factor = self.tree.check_tree_balance(self.tree.root)
+        if self.unbalanced is None:
+            return True
+        else:
+            self.callback("Tree unbalanced at node [%s], balance factor: %d" %
+                          (str(self.unbalanced), self.balance_factor))
+            self.click_lock = True
+            return False        # indicates to caller that tree needs balancing
 
     def balance_tree(self):
-        unbalanced, factor = self.tree.check_tree_balance(self.tree.root)
-        if unbalanced is None:
-            print("tree balanced")
-            return
+        if self.balance_factor < 0:
+            self.tree.rotate_right(self.unbalanced)
         else:
-            print("tree unbalanced at node %s, balance factor: %d" % (str(unbalanced), factor))
-        if factor < 0:
-            self.rotate_right(unbalanced)
-        else:
-            self.rotate_left(unbalanced)
+            self.tree.rotate_left(self.unbalanced)
         self._redraw_tree()
-
-    def rotate_left(self, node):
-        y = node.get_right()
-        node.set_right(y.get_left())
-        if y.get_left() is not None:
-            y.get_left().set_parent(node)
-        y.set_parent(node.get_parent())
-        if node.get_parent() is None:
-            self.tree.root = y
-        elif node == node.get_parent().get_left():
-            node.get_parent().set_left(y)
-        else:
-            node.get_parent().set_right(y)
-        y.set_left(node)
-        node.set_parent(y)
-
-
-    def rotate_right(self, node):
-        pass
+        self.click_lock = False
 
     def _redraw_tree(self):
         self.clear()
@@ -209,7 +203,7 @@ class BinaryTreeCanvas:
         self.clear()
 
     def is_empty(self):
-        return (self.tree is None) or (self.tree.n == 0)
+        return (self.tree is None) or (self.tree.root is None)
 
 
 class CanvasTreeNode(BinaryTree.TreeNode):
