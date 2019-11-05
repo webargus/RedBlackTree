@@ -71,6 +71,7 @@ class BinaryTreeCanvas:
         self.callback("Deleting node %s..." % str(node))
         y = self.tree.delete(node)
         self._redraw_tree()
+        self.balance_tree()
 
     def _select_node(self, node):
         self.canvas.coords(self.sel_rect,
@@ -90,6 +91,39 @@ class BinaryTreeCanvas:
             return
         self._redraw_tree()
         self.callback("Click on a node to call BST search for node key")
+        self.balance_tree()
+
+    def balance_tree(self):
+        unbalanced, factor = self.tree.check_tree_balance(self.tree.root)
+        if unbalanced is None:
+            print("tree balanced")
+            return
+        else:
+            print("tree unbalanced at node %s, balance factor: %d" % (str(unbalanced), factor))
+        if factor < 0:
+            self.rotate_right(unbalanced)
+        else:
+            self.rotate_left(unbalanced)
+        self._redraw_tree()
+
+    def rotate_left(self, node):
+        y = node.get_right()
+        node.set_right(y.get_left())
+        if y.get_left() is not None:
+            y.get_left().set_parent(node)
+        y.set_parent(node.get_parent())
+        if node.get_parent() is None:
+            self.tree.root = y
+        elif node == node.get_parent().get_left():
+            node.get_parent().set_left(y)
+        else:
+            node.get_parent().set_right(y)
+        y.set_left(node)
+        node.set_parent(y)
+
+
+    def rotate_right(self, node):
+        pass
 
     def _redraw_tree(self):
         self.clear()
@@ -100,11 +134,11 @@ class BinaryTreeCanvas:
         width = self.canvas.winfo_width() - 2*CanvasTreeNode.NODE_RADIUS
         dx = 2*CanvasTreeNode.NODE_RADIUS
         parent = node.get_parent()
-        if parent is None:
+        if parent is None:                  # that's the root node
             node.x = width//2
-            node.y = dx
+            node.y = 2*dx
         else:
-            const = dx*2**(self.tree.get_node_height(parent) - 2)
+            const = dx*2**(self.tree.get_node_height(parent) - 1)
             node.x = parent.x
             if parent.get_left() == node:       # node belongs to left sub-tree
                 node.x -= const
@@ -132,6 +166,19 @@ class BinaryTreeCanvas:
                                 fill="blue",
                                 activefill="red",
                                 tags=("node", key))
+        # draw balance factor
+        parent = node.get_parent()
+        sign = 1
+        if parent is not None:
+            sign = -1 + 2*(parent.get_right() == node)
+        self.canvas.create_rectangle(x+.8*sign*CanvasTreeNode.NODE_RADIUS,
+                                     y-2*CanvasTreeNode.NODE_RADIUS,
+                                     x+2*sign*CanvasTreeNode.NODE_RADIUS,
+                                     y-.8*CanvasTreeNode.NODE_RADIUS)
+        self.canvas.create_text(x+1.4*sign*CanvasTreeNode.NODE_RADIUS,
+                                y-1.4*CanvasTreeNode.NODE_RADIUS,
+                                text=self.tree.get_balance_factor(node),
+                                font=CanvasTreeNode.FONT)
         self.canvas.tag_bind(text, '<Button-1>', self._handle_click)
 
     def _draw_edge(self, node1,  node2):

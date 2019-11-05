@@ -167,9 +167,21 @@ class BinaryTree:
 
     def get_node_height(self, node):
         if node is None:
-            return 0
+            return -1
         else:
             return max(self.get_node_height(node.get_left()), self.get_node_height(node.get_right())) + 1
+
+    def get_balance_factor(self, node):
+        return self.get_node_height(node.get_right()) - self.get_node_height(node.get_left())
+
+    def check_tree_balance(self, node):
+        if node is None:
+            return None, 0
+        balance_factor = self.get_balance_factor(node)
+        if (balance_factor < -1) or (balance_factor > 1):
+            return node, balance_factor
+        return self.check_tree_balance(node.get_left())
+        return self.check_tree_balance(node.get_right())
 
 
 
