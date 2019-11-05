@@ -175,43 +175,88 @@ class BinaryTree:
         return self.get_node_height(node.get_right()) - self.get_node_height(node.get_left())
 
     def check_tree_balance(self, node):
+        n, f = self._check_balance_left(node)
+        if n is None:
+            return self._check_balance_right(node)
+        return n, f
+
+    def _check_balance_left(self, node):
         if node is None:
             return None, 0
         balance_factor = self.get_balance_factor(node)
         if (balance_factor < -1) or (balance_factor > 1):
             return node, balance_factor
-        return self.check_tree_balance(node.get_left())
-        return self.check_tree_balance(node.get_right())
+        return self._check_balance_left(node.get_left())
+
+    def _check_balance_right(self, node):
+        if node is None:
+            return None, 0
+        balance_factor = self.get_balance_factor(node)
+        if (balance_factor < -1) or (balance_factor > 1):
+            return node, balance_factor
+        return self._check_balance_right(node.get_right())
+
+    # left rotate
+    #       a           (node)                        b
+    #      / \                                     /     \
+    #     Sa  b                     =>            a       c
+    #        / \                                 / \     /
+    #      Sb   c                              Sa   Sb  Sc
+    #          /
+    #        Sc
 
     def rotate_left(self, node):
-        y = node.get_right()
-        node.set_right(y.get_left())
-        if y.get_left() is not None:
-            y.get_left().set_parent(node)
-        y.set_parent(node.get_parent())
+        b = node.get_right()        # y
+        sb = b.get_left()
+        node.set_right(sb)
+        if sb is not None:
+            sb.set_parent(node)
+        b.set_parent(node.get_parent())
         if node.get_parent() is None:
-            self.root = y
+            self.root = b
         elif node == node.get_parent().get_left():
-            node.get_parent().set_left(y)
+            node.get_parent().set_left(b)
         else:
-            node.get_parent().set_right(y)
-        y.set_left(node)
-        node.set_parent(y)
+            node.get_parent().set_right(b)
+        b.set_left(node)
+        node.set_parent(b)
+
+        """b.set_parent(node.get_parent())
+        if node.get_parent() is None:
+            self.root = b
+        node.set_parent(b)
+        sb = b.get_left()
+        b.set_left(node)
+        node.set_right(sb)
+        if sb is not None:
+            sb.set_parent(node)"""
 
     def rotate_right(self, node):
-        y = node.get_left()
-        node.set_left(y.get_right())
-        if y.get_right() is not None:
-            y.get_right().set_parent(node)
-        y.set_parent(node.get_parent())
+        b = node.get_left()        # y
+        sb = b.get_right()
+        node.set_left(sb)
+        if sb is not None:
+            sb.set_parent(node)
+        b.set_parent(node.get_parent())
         if node.get_parent() is None:
-            self.root = y
+            self.root = b
         elif node == node.get_parent().get_right():
-            node.get_parent().set_right(y)
+            node.get_parent().set_right(b)
         else:
-            node.get_parent().set_left(y)
-        y.set_right(node)
-        node.set_parent(y)
+            node.get_parent().set_left(b)
+        b.set_right(node)
+        node.set_parent(b)
+
+        """b = node.get_left()
+        b.set_parent(node.get_parent())
+        if node.get_parent() is None:
+            self.root = b
+        node.set_parent(b)
+        sb = b.get_right()
+        b.set_right(node)
+        node.set_left(sb)
+        if sb is not None:
+            sb.set_parent(node)"""
 
 
 

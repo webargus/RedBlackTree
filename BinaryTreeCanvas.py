@@ -109,12 +109,19 @@ class BinaryTreeCanvas:
             self.callback("Tree unbalanced at node [%s], balance factor: %d" %
                           (str(self.unbalanced), self.balance_factor))
             self.click_lock = True
+            self._redraw_tree()
             return False        # indicates to caller that tree needs balancing
 
     def balance_tree(self):
         if self.balance_factor < 0:
+            child = self.unbalanced.get_left()
+            if child.get_left() is None:
+                self.tree.rotate_left(child)
             self.tree.rotate_right(self.unbalanced)
         else:
+            child = self.unbalanced.get_right()
+            if child.get_right() is None:
+                self.tree.rotate_right(child)
             self.tree.rotate_left(self.unbalanced)
         self._redraw_tree()
         self.click_lock = False
