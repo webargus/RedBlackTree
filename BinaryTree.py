@@ -221,16 +221,6 @@ class BinaryTree:
         b.set_left(node)
         node.set_parent(b)
 
-        """b.set_parent(node.get_parent())
-        if node.get_parent() is None:
-            self.root = b
-        node.set_parent(b)
-        sb = b.get_left()
-        b.set_left(node)
-        node.set_right(sb)
-        if sb is not None:
-            sb.set_parent(node)"""
-
     def rotate_right(self, node):
         b = node.get_left()        # y
         sb = b.get_right()
@@ -246,17 +236,6 @@ class BinaryTree:
             node.get_parent().set_left(b)
         b.set_right(node)
         node.set_parent(b)
-
-        """b = node.get_left()
-        b.set_parent(node.get_parent())
-        if node.get_parent() is None:
-            self.root = b
-        node.set_parent(b)
-        sb = b.get_right()
-        b.set_right(node)
-        node.set_left(sb)
-        if sb is not None:
-            sb.set_parent(node)"""
 
 
 
