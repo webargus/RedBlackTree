@@ -174,28 +174,6 @@ class BinaryTree:
     def get_balance_factor(self, node):
         return self.get_node_height(node.get_right()) - self.get_node_height(node.get_left())
 
-    def check_tree_balance(self, node):
-        n, f = self._check_balance_left(node)
-        if n is None:
-            return self._check_balance_right(node)
-        return n, f
-
-    def _check_balance_left(self, node):
-        if node is None:
-            return None, 0
-        balance_factor = self.get_balance_factor(node)
-        if (balance_factor < -1) or (balance_factor > 1):
-            return node, balance_factor
-        return self._check_balance_left(node.get_left())
-
-    def _check_balance_right(self, node):
-        if node is None:
-            return None, 0
-        balance_factor = self.get_balance_factor(node)
-        if (balance_factor < -1) or (balance_factor > 1):
-            return node, balance_factor
-        return self._check_balance_right(node.get_right())
-
     # left rotate
     #       a           (node)                        b
     #      / \                                     /     \

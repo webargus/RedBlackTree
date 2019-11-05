@@ -175,13 +175,13 @@ class BinaryTreePanel:
             self._enable_btn(self.node_add_btn, False)
 
     def _balance_tree(self):
-        self.canvas.balance_tree()
-        self._enable_btn(self.node_add_btn)
-        self._enable_btn(self.balance_btn, False)
-        if self.canvas.is_empty():
-            self._disable_all_btns()
-        else:
-            self._disable_sel_btns()
+        if self.canvas.balance_tree():
+            self._enable_btn(self.node_add_btn)
+            self._enable_btn(self.balance_btn, False)
+            if self.canvas.is_empty():
+                self._disable_all_btns()
+            else:
+                self._disable_sel_btns()
 
     def _feedback(self, msg, sel=False):
         self.feedback.set(msg)

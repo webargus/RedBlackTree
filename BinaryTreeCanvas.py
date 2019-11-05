@@ -90,41 +90,56 @@ class BinaryTreeCanvas:
         self.selected = node
 
     def add_node(self, key):
+        node = CanvasTreeNode(key)
         try:
-            self.tree.add(CanvasTreeNode(key))
+            self.tree.add(node)
         except ValueError:
             self.callback("Insertion failed: key %d already exists" % key)
             return True
         self._redraw_tree()
-        ret = self._check_tree_balance()
+        ret = self._check_tree_balance(node)
         if ret:
             self.callback("Click on a node to call BST search for node key")
         return ret
 
-    def _check_tree_balance(self):
-        self.unbalanced, self.balance_factor = self.tree.check_tree_balance(self.tree.root)
-        if self.unbalanced is None:
-            return True
-        else:
-            self.callback("Tree unbalanced at node [%s], balance factor: %d" %
-                          (str(self.unbalanced), self.balance_factor))
-            self.click_lock = True
-            self._redraw_tree()
-            return False        # indicates to caller that tree needs balancing
+    def _check_tree_balance(self, node):
+        node = node.get_parent()
+        while node is not None:
+            balance_factor = self.tree.get_balance_factor(node)
+            if abs(balance_factor) > 1:
+                self.balance_factor = balance_factor
+                self.unbalanced = node
+                self.callback("Tree unbalanced at node [%s], balance factor: %d" %
+                              (str(self.unbalanced), self.balance_factor))
+                self.click_lock = True
+                self._redraw_tree()
+                return False
+            node = node.get_parent()
+        return True
 
     def balance_tree(self):
         if self.balance_factor < 0:
             child = self.unbalanced.get_left()
-            if child.get_left() is None:
+            if self.tree.get_balance_factor(child) > 0:
                 self.tree.rotate_left(child)
+                self.callback("Performed double right rotation (L-%d, R-%d)" % (child.get_key(), self.unbalanced.get_key()))
+            else:
+                self.callback("Performed right rotation (R-%d)" % self.unbalanced.get_key())
             self.tree.rotate_right(self.unbalanced)
         else:
             child = self.unbalanced.get_right()
-            if child.get_right() is None:
+            if self.tree.get_balance_factor(child) < 0:
                 self.tree.rotate_right(child)
+                self.callback("Performed double left rotation (R-%d, L-%d)" % (child.get_key(), self.unbalanced.get_key()))
+            else:
+                self.callback("Performed left rotation (L-%d)" % self.unbalanced.get_key())
             self.tree.rotate_left(self.unbalanced)
         self._redraw_tree()
-        self.click_lock = False
+
+        ret = self._check_tree_balance(self.unbalanced)
+        if ret:
+            self.click_lock = False
+        return ret
 
     def _redraw_tree(self):
         self.clear()
