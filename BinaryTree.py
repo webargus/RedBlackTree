@@ -199,7 +199,20 @@ class BinaryTree:
         node.set_parent(y)
 
     def rotate_right(self, node):
-        pass
+        y = node.get_left()
+        node.set_left(y.get_right())
+        if y.get_right() is not None:
+            y.get_right().set_parent(node)
+        y.set_parent(node.get_parent())
+        if node.get_parent() is None:
+            self.root = y
+        elif node == node.get_parent().get_right():
+            node.get_parent().set_right(y)
+        else:
+            node.get_parent().set_left(y)
+        y.set_right(node)
+        node.set_parent(y)
+
 
 
 
