@@ -31,24 +31,17 @@ class BinaryTreePanel:
         form = Frame(frame_editing, {"padx": 8})
         form.grid({"row": 0, "column": 0, "sticky": NSEW})
 
-        self.rb_var = IntVar()
-        self.r1 = Radiobutton(form, text="AVL", variable=self.rb_var, value=1)
-        self.r1.grid(row=0, column=0, sticky=W)
-        self.r2 = Radiobutton(form, text="Red & Black", variable=self.rb_var, value=2)
-        self.r2.grid(row=0, column=1, sticky=W)
-        self.rb_var.set(1)
-
-        Label(form, text="Key:", font=("Arial", 10)).grid(row=0, column=2, sticky=W)
+        Label(form, text="Key:", font=("Arial", 10)).grid(row=0, column=0, sticky=W)
         self.node_value = StringVar()
         self.node_value_entry = Entry(form, font=("Arial", 10), width=5, textvar=self.node_value)
-        self.node_value_entry.grid(row=0, column=3, sticky=W)
+        self.node_value_entry.grid(row=0, column=1, sticky=W)
 
         self.node_add_btn = Button(form, text="Insert", font=("Arial", 10), width=8, command=self._add_node)
-        self.node_add_btn.grid(row=0, column=4, sticky=W)
+        self.node_add_btn.grid(row=0, column=2, sticky=W)
 
         # add frame and blank label just to create left margin before delete and clear btns
         spacer = Frame(form)
-        spacer.grid(row=0, column=5, sticky=W)
+        spacer.grid(row=0, column=3, sticky=W)
         Label(spacer, text=" "*20).grid(row=0, column=0)
 
         self.del_node_btn = Button(form,
@@ -57,14 +50,14 @@ class BinaryTreePanel:
                                    width=8,
                                    state="disabled",
                                    command=self._delete)
-        self.del_node_btn.grid(row=0, column=6, sticky=E)
+        self.del_node_btn.grid(row=0, column=4, sticky=E)
 
         self.clear_tree_btn = Button(form,
                                      text="Clear",
                                      font=("Arial", 10),
                                      width=8,
                                      command=self._clear_tree)
-        self.clear_tree_btn.grid(row=0, column=7, sticky=E)
+        self.clear_tree_btn.grid(row=0, column=9, sticky=E)
 
         op_frame = LabelFrame(wrap, text=" Operation ", height=40)
         op_frame.grid(row=2, column=0, sticky=EW, ipady=4, ipadx=4, padx=8)
@@ -127,12 +120,6 @@ class BinaryTreePanel:
         except ValueError:
             messagebox.showerror("Invalid input", "Please, enter integers only")
             return
-
-        if self.canvas.is_empty():
-            self.canvas.tree_type = self.rb_var.get()
-            self._enable_btn(self.r1, False)
-            self._enable_btn(self.r2, False)
-
         if self.canvas.add_node(key):
             self._disable_sel_btns()
         else:
@@ -158,12 +145,10 @@ class BinaryTreePanel:
         self._enable_btn(self.clear_tree_btn, False)
         self._enable_btn(self.balance_btn, False)
         self._enable_btn(self.node_add_btn)
-        self._enable_btn(self.r1)
-        self._enable_btn(self.r2)
 
     def _clear_tree(self):
         self.canvas.clear_tree()
-        self._feedback("Insert a root node into tree")
+        self._feedback("Insert a root node into AVL")
         self._disable_all_btns()
 
     def _maximum(self):
