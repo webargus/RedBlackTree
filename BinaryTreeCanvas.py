@@ -1,5 +1,6 @@
 from tkinter import *
 import BinaryTree
+import RedBlackBinaryTree
 
 
 class BinaryTreeCanvas:
@@ -18,6 +19,7 @@ class BinaryTreeCanvas:
         self.selected = self.sel_rect = self.tree = self.unbalanced = None
         self.balance_factor = 0
         self.click_lock = False
+        self.tree_type = 1
 
     def _handle_click(self, event):
         if self.click_lock:
@@ -72,9 +74,9 @@ class BinaryTreeCanvas:
         node = self.selected
         if node is None:
             return
-        self.tree.delete(node)
+        y = self.tree.delete(node)
         self._redraw_tree()
-        ret = self._check_tree_balance()
+        ret = self._check_tree_balance(y)
         if ret:
             self.callback("Deleted node [%s]" % str(node))
         return ret
@@ -90,6 +92,13 @@ class BinaryTreeCanvas:
         self.selected = node
 
     def add_node(self, key):
+
+        if self.tree is None:
+            if self.tree_type == 1:
+                self.tree = BinaryTree.BinaryTree()
+            else:
+                self.tree = RedBlackBinaryTree.RedBlackBinaryTree()
+
         node = CanvasTreeNode(key)
         try:
             self.tree.add(node)
@@ -221,7 +230,7 @@ class BinaryTreeCanvas:
         self.selected = None
 
     def clear_tree(self):
-        self.tree = BinaryTree.BinaryTree()
+        self.tree = None
         self.clear()
 
     def is_empty(self):
