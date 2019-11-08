@@ -18,11 +18,11 @@ class ScrollableText(Text):
 
         #   position Text widget on the left side of frame
         self.grid({"row": 0, "column": 0, "sticky": NSEW})
-        #   add vertical scrollbar
+        #   insert vertical scrollbar
         vscroll = ttk.Scrollbar(frame, orient=VERTICAL, command=self.yview)
         vscroll.grid({"row": 0, "column": 1, "sticky": NS})
         self.configure(yscrollcommand=vscroll.set)
-        # add horizontal scrollbar
+        # insert horizontal scrollbar
         hscroll = ttk.Scrollbar(frame, orient=HORIZONTAL, command=self.xview)
         hscroll.grid(row=1, column=0, sticky=EW)
         self.configure(xscrollcommand=hscroll.set, wrap=NONE)

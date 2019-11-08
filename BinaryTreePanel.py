@@ -20,7 +20,7 @@ class BinaryTreePanel:
 
         header = Frame(wrap)
         header.grid({"row": 0, "column": 0, "sticky": EW})
-        l1 = Label(header, {"text": "Binary tree implementation",
+        l1 = Label(header, {"text": "Red-black tree implementation",
                             "font": ("Arial", 12),
                             "pady": 4,
                             "padx": 4})
@@ -36,10 +36,10 @@ class BinaryTreePanel:
         self.node_value_entry = Entry(form, font=("Arial", 10), width=5, textvar=self.node_value)
         self.node_value_entry.grid(row=0, column=1, sticky=W)
 
-        self.node_add_btn = Button(form, text="Insert", font=("Arial", 10), width=8, command=self._add_node)
+        self.node_add_btn = Button(form, text="Insert", font=("Arial", 10), width=8, command=self._insert_node)
         self.node_add_btn.grid(row=0, column=2, sticky=W)
 
-        # add frame and blank label just to create left margin before delete and clear btns
+        # insert frame and blank label just to create left margin before delete and clear btns
         spacer = Frame(form)
         spacer.grid(row=0, column=3, sticky=W)
         Label(spacer, text=" "*20).grid(row=0, column=0)
@@ -114,19 +114,13 @@ class BinaryTreePanel:
         self.canvas = BinaryTreeCanvas.BinaryTreeCanvas(canvasF, self._feedback)
         self._clear_tree()
 
-    def _add_node(self):
+    def _insert_node(self):
         try:
             key = int(self.node_value.get())
         except ValueError:
             messagebox.showerror("Invalid input", "Please, enter integers only")
             return
-        if self.canvas.add_node(key):
-            self._disable_sel_btns()
-        else:
-            self._disable_all_btns()
-            self._enable_btn(self.balance_btn)
-            self._enable_btn(self.clear_tree_btn)
-            self._enable_btn(self.node_add_btn, False)
+        self.canvas.insert_node(key)
 
     def _disable_sel_btns(self):
         self._enable_btn(self.max_button)
@@ -148,7 +142,7 @@ class BinaryTreePanel:
 
     def _clear_tree(self):
         self.canvas.clear_tree()
-        self._feedback("Insert a root node into AVL")
+        self._feedback("Insert a root node into red-black tree")
         self._disable_all_btns()
 
     def _maximum(self):

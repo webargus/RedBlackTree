@@ -1,5 +1,5 @@
 from tkinter import *
-import BinaryTree
+import RedBlackBinaryTree as rbt
 
 
 class BinaryTreeCanvas:
@@ -10,7 +10,7 @@ class BinaryTreeCanvas:
 
         self.canvas = Canvas(frame, background="white", cursor="hand1")
         self.canvas.grid(row=0, column=0, sticky=NSEW)
-        # add horizontal scrollbar
+        # insert horizontal scrollbar
         hscroll = Scrollbar(frame, orient=HORIZONTAL, command=self.canvas.xview)
         hscroll.grid(row=1, column=0, sticky=EW)
         self.canvas.configure(xscrollcommand=hscroll.set)
@@ -89,18 +89,15 @@ class BinaryTreeCanvas:
         self.canvas.itemconfigure(self.sel_rect, state="normal")
         self.selected = node
 
-    def add_node(self, key):
+    def insert_node(self, key):
         node = CanvasTreeNode(key)
         try:
-            self.tree.add(node)
+            self.tree.insert(node)
         except ValueError:
             self.callback("Insertion failed: key %d already exists" % key)
             return True
         self._redraw_tree()
-        ret = self._check_tree_balance(node)
-        if ret:
-            self.callback("Click on a node to call BST search for node key")
-        return ret
+        self.callback("Click on a node to call BST search for node key")
 
     def _check_tree_balance(self, node):
         node = node.get_parent()
@@ -150,7 +147,7 @@ class BinaryTreeCanvas:
         width = self.canvas.winfo_width() - 2*CanvasTreeNode.NODE_RADIUS
         dx = 2*CanvasTreeNode.NODE_RADIUS
         parent = node.get_parent()
-        if parent is None:                  # that's the root node
+        if parent == rbt.BinaryTree.NIL:                  # that's the root node
             node.x = width//2
             node.y = 2*dx
         else:
@@ -164,8 +161,9 @@ class BinaryTreeCanvas:
             node.y = parent.y + 4*CanvasTreeNode.NODE_RADIUS
 
         self._draw_node(node, node.x, node.y)
-        if parent is not None:
-            self._draw_edge(parent, node)
+        if parent == rbt.BinaryTree.NIL:
+            return
+        self._draw_edge(parent, node)
 
     def _draw_node(self, node, x, y):
         key = node.get_key()
@@ -174,18 +172,19 @@ class BinaryTreeCanvas:
                                 y - CanvasTreeNode.NODE_RADIUS,
                                 x + CanvasTreeNode.NODE_RADIUS,
                                 y + CanvasTreeNode.NODE_RADIUS,
-                                fill="yellow")
+                                fill=node.get_color(),
+                                outline="orange")
         text = self.canvas.create_text(x,
                                 y,
                                 text=key,
                                 font=CanvasTreeNode.FONT,
-                                fill="blue",
-                                activefill="red",
+                                fill="white",
+                                activefill="yellow",
                                 tags=("node", key))
         # draw balance factor
         parent = node.get_parent()
         sign = 1
-        if parent is not None:
+        if parent != rbt.BinaryTree.NIL:
             sign = -1 + 2*(parent.get_right() == node)
         self.canvas.create_rectangle(x+.8*sign*CanvasTreeNode.NODE_RADIUS,
                                      y-2*CanvasTreeNode.NODE_RADIUS,
@@ -221,32 +220,32 @@ class BinaryTreeCanvas:
         self.selected = None
 
     def clear_tree(self):
-        self.tree = BinaryTree.BinaryTree()
+        self.tree = rbt.BinaryTree()
         self.clear()
 
     def is_empty(self):
         return (self.tree is None) or (self.tree.root is None)
 
 
-class CanvasTreeNode(BinaryTree.TreeNode):
+class CanvasTreeNode(rbt.TreeNode):
 
-    NODE_RADIUS = 10
+    NODE_RADIUS = 12
     FONT = ("Arial", 10)
 
-    def __init__(self, key, parent=None, left=None, right=None):
-        super(CanvasTreeNode, self).__init__(key, parent, left, right)
+    def __init__(self, key, color="red", parent=None, left=None, right=None):
+        super(CanvasTreeNode, self).__init__(key, color, parent, left, right)
         self.x = self.y = 0
 
     def __str__(self):
         s = "key: %s, " % self.get_key()
         s += "parent: %s, " % self._to_string(self.get_parent())
         s += "left child: %s, " % self._to_string(self.get_left())
-        s += "right child: %s" % self._to_string(self.get_right())
+        s += "right child: %s," % self._to_string(self.get_right())
         return s
 
     def _to_string(self, node):
-        if node is None:
-            txt = "None"
+        if node == rbt.BinaryTree.NIL:
+            txt = "T.nil"
         else:
             txt = node.get_key()
         return txt
