@@ -241,6 +241,7 @@ class CanvasTreeNode(rbt.TreeNode):
         s += "parent: %s, " % self._to_string(self.get_parent())
         s += "left child: %s, " % self._to_string(self.get_left())
         s += "right child: %s," % self._to_string(self.get_right())
+        s += "color: %s" % self.get_color()
         return s
 
     def _to_string(self, node):
