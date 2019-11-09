@@ -17,35 +17,37 @@ class BinaryTreeCanvas:
         self.canvas.configure(xscrollcommand=hscroll.set)
 
         self.selected = self.sel_rect = self.tree = self.unbalanced = None
-        self.balance_factor = 0
-        self.click_lock = False
 
     def _handle_click(self, event):
-        if self.click_lock:
-            return
         item = self.canvas.find_withtag("current")
         tags = self.canvas.gettags(item)
         if (len(tags) > 1) and (tags[0] == "node"):
-            node = self.tree.search(int(tags[1]), self.tree.root)
+            node = self.tree.search(int(tags[1]), self.tree.get_root())
             self._select_node(node)
             txt = "Search for key %s returned node [%s]" % (tags[1], str(node))
-            self.callback(txt, True)
+            self.callback(txt)
 
     def maximum(self):
-        max_node = self.tree.maximum(self.tree.root)
-        if max_node is None:
+        root = self.tree.get_root()
+        if root == rbt.BinaryTree.NIL:
+            return
+        max_node = self.tree.maximum(root)
+        if max_node == rbt.BinaryTree.NIL:
             self.callback("There is no maximum BST key")
         else:
             self._select_node(max_node)
-            self.callback("Maximum BST key: %d" % max_node.get_key(), True)
+            self.callback("Maximum BST key: %d" % max_node.get_key())
 
     def minimum(self):
-        min_node = self.tree.minimum(self.tree.root)
-        if min_node is None:
+        root = self.tree.get_root()
+        if root == rbt.BinaryTree.NIL:
+            return
+        min_node = self.tree.minimum(root)
+        if min_node == rbt.BinaryTree.NIL:
             self.callback("There is no minimum BST key")
         else:
             self._select_node(min_node)
-            self.callback("Minimum BST key: %d" % min_node.get_key(), True)
+            self.callback("Minimum BST key: %d" % min_node.get_key())
 
     def successor(self):
         node = self.selected
@@ -53,7 +55,7 @@ class BinaryTreeCanvas:
             return
         successor = self.tree.successor(node)
         k = node.get_key()
-        if successor is None:
+        if successor == rbt.BinaryTree.NIL:
             self.callback("There is no successor for %d, i.e., %d is the BST maximum" % (k, k))
         else:
             self.callback("The successor of %d is %d" % (k, successor.get_key()))
@@ -64,7 +66,7 @@ class BinaryTreeCanvas:
             return
         predecessor = self.tree.predecessor(node)
         k = node.get_key()
-        if predecessor is None:
+        if predecessor == rbt.BinaryTree.NIL:
             self.callback("There is no predecessor for %d, i.e., %d is the BST minimum" % (k, k))
         else:
             self.callback("The predecessor of %d is %d" % (k, predecessor.get_key()))
@@ -73,12 +75,9 @@ class BinaryTreeCanvas:
         node = self.selected
         if node is None:
             return
-        y = self.tree.delete(node)
+        self.tree.delete(node)
         self._redraw_tree()
-        ret = self._check_tree_balance(y)
-        if ret:
-            self.callback("Deleted node [%s]" % str(node))
-        return ret
+        self.callback("Deleted node [%s]" % str(node))
 
     def _select_node(self, node):
         self.canvas.coords(self.sel_rect,
@@ -98,11 +97,11 @@ class BinaryTreeCanvas:
             self.callback("Insertion failed: key %d already exists" % key)
             return True
         self._redraw_tree()
-        self.callback("Click on a node to call BST search for node key")
+        self.callback("Click on a node to call BST search for node key and prompt it for operations")
 
     def _redraw_tree(self):
         self.clear()
-        self.tree.pre_order_tree_walk(self.tree.root, self.draw_tree)
+        self.tree.pre_order_tree_walk(self.tree.get_root(), self.draw_tree)
 
     def draw_tree(self, node):
         # print(node)             # debug
@@ -187,7 +186,7 @@ class BinaryTreeCanvas:
         self.clear()
 
     def is_empty(self):
-        return (self.tree is None) or (self.tree.root is None)
+        return (self.tree is None) or (self.tree.get_root() == rbt.BinaryTree.NIL)
 
 
 class CanvasTreeNode(rbt.TreeNode):

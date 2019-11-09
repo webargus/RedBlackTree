@@ -47,8 +47,11 @@ class BinaryTree:
     NIL = TreeNode(None, "black")
 
     def __init__(self):
-        self.root = BinaryTree.NIL
+        self.__root = BinaryTree.NIL
         self.n = 0
+
+    def get_root(self):
+        return self.__root
 
     def get_tree_height(self):
         if self.n == 0:
@@ -58,7 +61,7 @@ class BinaryTree:
     def insert(self, node):
         self.n += 1
         y = BinaryTree.NIL
-        x = self.root
+        x = self.__root
         while x != BinaryTree.NIL:
             y = x
             if node.get_key() == x.get_key():
@@ -69,7 +72,7 @@ class BinaryTree:
                 x = x.get_right()
         node.set_parent(y)
         if y == BinaryTree.NIL:
-            self.root = node
+            self.__root = node
         elif node.get_key() < y.get_key():
             y.set_left(node)
         else:
@@ -110,7 +113,70 @@ class BinaryTree:
                 if (grandpa != BinaryTree.NIL) and (grandpa is not None):
                     grandpa.set_color("red")
                     self.rotate_left(grandpa)
-        self.root.set_color("black")
+        self.__root.set_color("black")
+
+    def delete(self, z):
+        if (z.get_left() == BinaryTree.NIL) or (z.get_right() == BinaryTree.NIL):
+            y = z
+        else:
+            y = self.successor(z)
+        if y.get_left() != BinaryTree.NIL:
+            x = y.get_left()
+        else:
+            x = y.get_right()
+        x.set_parent(y.get_parent())
+        if y.get_parent() == BinaryTree.NIL:
+            self.__root = x
+        elif y == y.get_parent().get_left():
+            y.get_parent().set_left(x)
+        else:
+            y.get_parent().set_right(x)
+        if y != z:
+            z.set_key(y.get_key())
+        if y.get_color() == "black":
+            self.__rb_delete_fixup(x)
+
+    def __rb_delete_fixup(self, x):
+        while (x != self.__root) and (x.get_color() == "black"):
+            if x == x.get_parent().get_left():
+                w = x.get_parent().get_right()
+                if w.get_color() == "red":
+                    w.set_color("black")
+                    x.get_parent().set_color("red")
+                    self.rotate_left(x.get_parent())
+                    w = x.get_parent().get_right()
+                if (w.get_left().get_color() == "black") and (w.get_right().get_color() == "black"):
+                    w.set_color("red")
+                    x = x.get_parent()
+                elif w.get_right().get_color() == "black":
+                    w.get_left().set_color("red")
+                    self.rotate_right(w)
+                    w = x.get_parent().get_right()
+                    w.set_color(x.get_parent().get_color())
+                    x.get_parent().set_color("black")
+                    w.get_right().set_color("black")
+                    self.rotate_left(x.get_parent())
+                    x = self.__root
+            else:
+                w = x.get_parent().get_left()
+                if w.get_color() == "red":
+                    w.set_color("black")
+                    x.get_parent().set_color("red")
+                    self.rotate_left(x.get_parent())
+                    w = x.get_parent().get_left()
+                if (w.get_right().get_color() == "black") and (w.get_left().get_color() == "black"):
+                    w.set_color("red")
+                    x = x.get_parent()
+                elif w.get_left().get_color() == "black":
+                    w.get_right().set_color("red")
+                    self.rotate_left(w)
+                    w = x.get_parent().get_left()
+                    w.set_color(x.get_parent().get_color())
+                    x.get_parent().set_color("black")
+                    w.get_left().set_color("black")
+                    self.rotate_right(x.get_parent())
+                    x = self.__root
+        x.set_color("black")
 
     # left rotate                                    y
     #       x                                       / \
@@ -128,7 +194,7 @@ class BinaryTree:
             y.get_left().set_parent(x)
         y.set_parent(x.get_parent())
         if x.get_parent() == BinaryTree.NIL:
-            self.root = y
+            self.__root = y
         elif x == x.get_parent().get_left():
             x.get_parent().set_left(y)
         else:
@@ -143,7 +209,7 @@ class BinaryTree:
             y.get_right().set_parent(x)
         y.set_parent(x.get_parent())
         if x.get_parent() == BinaryTree.NIL:
-            self.root = y
+            self.__root = y
         elif x == x.get_parent().get_right():
             x.get_parent().set_right(y)
         else:
@@ -178,14 +244,14 @@ class BinaryTree:
 
     # return maximum of subtree starting at @node
     def maximum(self, node):
-        while node is not None:
+        while node != BinaryTree.NIL:
             ret = node
             node = node.get_right()
         return ret
 
     # return minimum of subtree starting at @node
     def minimum(self, node):
-        while node is not None:
+        while node != BinaryTree.NIL:
             ret = node
             node = node.get_left()
         return ret
@@ -194,12 +260,12 @@ class BinaryTree:
     def successor(self, node):
         # just get the minimum of right subtree of node, if there is a right subtree
         n = node.get_right()
-        if n is not None:
+        if n != BinaryTree.NIL:
             return self.minimum(n)
         # go up towards root otherwise, until we find a parent node
         # having a different right branch from current node
         n = node.get_parent()
-        while (n is not None) and (n.get_right() == node):
+        while (n != BinaryTree.NIL) and (n.get_right() == node):
             node = n
             n = node.get_parent()
         return n
@@ -208,41 +274,15 @@ class BinaryTree:
     def predecessor(self, node):
         # just get the maximum of left subtree of node, if there is a left subtree
         n = node.get_left()
-        if n is not None:
+        if n != BinaryTree.NIL:
             return self.maximum(n)
         # go up towards BST root otherwise, until we find a parent node
         # having a different left branch from current node
         n = node.get_parent()
-        while (n is not None) and (n.get_left() == node):
+        while (n != BinaryTree.NIL) and (n.get_left() == node):
             node = n
             n = node.get_parent()
         return n
-
-    def delete(self, node):
-        left = node.get_left()
-        right = node.get_right()
-        if (left is None) or (right is None):
-            y = node
-        else:
-            y = self.successor(node)
-        w = y.get_left()
-        if w is not None:
-            x = w
-        else:
-            x = y.get_right()
-        w = y.get_parent()
-        if x is not None:
-            x.set_parent(w)
-        if w is None:
-            self.root = x
-        elif y == w.get_left():
-            w.set_left(x)
-        else:
-            w.set_right(x)
-        if y != node:
-            node.set_key(y.get_key())
-        self.n -= 1
-        return y
 
     def get_node_height(self, node):
         if node is None:

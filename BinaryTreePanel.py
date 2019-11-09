@@ -36,8 +36,8 @@ class BinaryTreePanel:
         self.node_value_entry = Entry(form, font=("Arial", 10), width=5, textvar=self.node_value)
         self.node_value_entry.grid(row=0, column=1, sticky=W)
 
-        self.node_add_btn = Button(form, text="Insert", font=("Arial", 10), width=8, command=self._insert_node)
-        self.node_add_btn.grid(row=0, column=2, sticky=W)
+        self.insert_node_btn = Button(form, text="Insert", font=("Arial", 10), width=8, command=self._insert_node)
+        self.insert_node_btn.grid(row=0, column=2, sticky=W)
 
         # insert frame and blank label just to create left margin before delete and clear btns
         spacer = Frame(form)
@@ -48,7 +48,6 @@ class BinaryTreePanel:
                                    text="Delete",
                                    font=("Arial", 10),
                                    width=8,
-                                   state="disabled",
                                    command=self._delete)
         self.del_node_btn.grid(row=0, column=4, sticky=E)
 
@@ -92,13 +91,6 @@ class BinaryTreePanel:
                                    command=self._predecessor)
         self.predecessor_btn.grid(row=0, column=3, sticky=E)
 
-        self.balance_btn = Button(op_form,
-                                  text="Balance",
-                                  font=("Arial", 10),
-                                  width=8,
-                                  command=self._balance_tree)
-        self.balance_btn.grid(row=0, column=4, sticky=E)
-
         fb_frame = Frame(wrap)
         fb_frame.grid(row=3, column=0, sticky=EW)
         # Feedback label
@@ -122,28 +114,9 @@ class BinaryTreePanel:
             return
         self.canvas.insert_node(key)
 
-    def _disable_sel_btns(self):
-        self._enable_btn(self.max_button)
-        self._enable_btn(self.minimum_btn)
-        self._enable_btn(self.clear_tree_btn)
-        self._enable_btn(self.predecessor_btn, False)
-        self._enable_btn(self.successor_btn, False)
-        self._enable_btn(self.del_node_btn, False)
-
-    def _disable_all_btns(self):
-        self._enable_btn(self.minimum_btn, False)
-        self._enable_btn(self.max_button, False)
-        self._enable_btn(self.predecessor_btn, False)
-        self._enable_btn(self.successor_btn, False)
-        self._enable_btn(self.del_node_btn, False)
-        self._enable_btn(self.clear_tree_btn, False)
-        self._enable_btn(self.balance_btn, False)
-        self._enable_btn(self.node_add_btn)
-
     def _clear_tree(self):
         self.canvas.clear_tree()
         self._feedback("Insert a root node into red-black tree")
-        self._disable_all_btns()
 
     def _maximum(self):
         self.canvas.maximum()
@@ -158,38 +131,12 @@ class BinaryTreePanel:
         self.canvas.predecessor()
 
     def _delete(self):
-        if self.canvas.delete():
-            if self.canvas.is_empty():
-                self._clear_tree()
-            else:
-                self._disable_sel_btns()
-        else:
-            self._disable_all_btns()
-            self._enable_btn(self.balance_btn)
-            self._enable_btn(self.clear_tree_btn)
-            self._enable_btn(self.node_add_btn, False)
+        self.canvas.delete()
+        if self.canvas.is_empty():
+            self._clear_tree()
 
-    def _balance_tree(self):
-        if self.canvas.balance_tree():
-            self._enable_btn(self.node_add_btn)
-            self._enable_btn(self.balance_btn, False)
-            if self.canvas.is_empty():
-                self._disable_all_btns()
-            else:
-                self._disable_sel_btns()
-
-    def _feedback(self, msg, sel=False):
+    def _feedback(self, msg):
         self.feedback.set(msg)
-        if sel:                                 # user selected some node in GUI
-            self._enable_btn(self.del_node_btn)
-            self._enable_btn(self.successor_btn)
-            self._enable_btn(self.predecessor_btn)
-
-    def _enable_btn(self, btn, en=True):
-        if en:
-            btn.configure(state="normal")
-        else:
-            btn.configure(state="disabled")
 
 
 
