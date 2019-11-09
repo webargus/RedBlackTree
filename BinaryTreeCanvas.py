@@ -16,7 +16,8 @@ class BinaryTreeCanvas:
         hscroll.grid(row=1, column=0, sticky=EW)
         self.canvas.configure(xscrollcommand=hscroll.set)
 
-        self.selected = self.sel_rect = self.tree = self.unbalanced = None
+        self.selected = self.sel_rect = None
+        self.tree = rbt.BinaryTree()
 
     def _handle_click(self, event):
         item = self.canvas.find_withtag("current")
@@ -75,8 +76,12 @@ class BinaryTreeCanvas:
         node = self.selected
         if node is None:
             return
+        print("node to delete: [%s]" % node)
         self.tree.delete(node)
-        self._redraw_tree()
+        if self.is_empty():
+            self.clear_tree()
+        else:
+            self._redraw_tree()
         self.callback("Deleted node [%s]" % str(node))
 
     def _select_node(self, node):
@@ -102,9 +107,10 @@ class BinaryTreeCanvas:
     def _redraw_tree(self):
         self.clear()
         self.tree.pre_order_tree_walk(self.tree.get_root(), self.draw_tree)
+        print("_"*30)
 
     def draw_tree(self, node):
-        # print(node)             # debug
+        print(node)             # debug
         width = self.canvas.winfo_width() - 2*CanvasTreeNode.NODE_RADIUS
         dx = 2*CanvasTreeNode.NODE_RADIUS
         parent = node.get_parent()
@@ -186,7 +192,7 @@ class BinaryTreeCanvas:
         self.clear()
 
     def is_empty(self):
-        return (self.tree is None) or (self.tree.get_root() == rbt.BinaryTree.NIL)
+        return self.tree.get_root() == rbt.BinaryTree.NIL
 
 
 class CanvasTreeNode(rbt.TreeNode):
@@ -194,7 +200,8 @@ class CanvasTreeNode(rbt.TreeNode):
     NODE_RADIUS = 12
     FONT = ("Arial", 10)
 
-    def __init__(self, key, color="red", parent=None, left=None, right=None):
+    def __init__(self, key, color="red"):
+        parent = left = right = rbt.BinaryTree.NIL
         super(CanvasTreeNode, self).__init__(key, color, parent, left, right)
         self.x = self.y = 0
 
@@ -203,15 +210,15 @@ class CanvasTreeNode(rbt.TreeNode):
         s += "parent: %s, " % self._to_string(self.get_parent())
         s += "left child: %s, " % self._to_string(self.get_left())
         s += "right child: %s," % self._to_string(self.get_right())
-        s += "color: %s" % self.get_color()
+        s += "color: %s " % self.get_color()
         return s
 
-    def _to_string(self, node):
-        if node == rbt.BinaryTree.NIL:
-            txt = "T.nil"
-        else:
-            txt = node.get_key()
-        return txt
+    """def __eq__(self, other):
+        return super().__eq__(other)
+
+    def __ne__(self, other):
+        return super().__ne__(other)"""
+
 
 
 
