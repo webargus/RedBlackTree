@@ -1,5 +1,6 @@
 from tkinter import *
 import RedBlackBinaryTree as rbt
+import math
 
 
 class BinaryTreeCanvas:
@@ -99,45 +100,6 @@ class BinaryTreeCanvas:
         self._redraw_tree()
         self.callback("Click on a node to call BST search for node key")
 
-    def _check_tree_balance(self, node):
-        node = node.get_parent()
-        while node is not None:
-            balance_factor = self.tree.get_balance_factor(node)
-            if abs(balance_factor) > 1:
-                self.balance_factor = balance_factor
-                self.unbalanced = node
-                self.callback("Tree unbalanced at node [%s], balance factor: %d" %
-                              (str(self.unbalanced), self.balance_factor))
-                self.click_lock = True
-                self._redraw_tree()
-                return False
-            node = node.get_parent()
-        return True
-
-    def balance_tree(self):
-        if self.balance_factor < 0:
-            child = self.unbalanced.get_left()
-            if self.tree.get_balance_factor(child) > 0:
-                self.tree.rotate_left(child)
-                self.callback("Performed double right rotation (L-%d, R-%d)" % (child.get_key(), self.unbalanced.get_key()))
-            else:
-                self.callback("Performed right rotation (R-%d)" % self.unbalanced.get_key())
-            self.tree.rotate_right(self.unbalanced)
-        else:
-            child = self.unbalanced.get_right()
-            if self.tree.get_balance_factor(child) < 0:
-                self.tree.rotate_right(child)
-                self.callback("Performed double left rotation (R-%d, L-%d)" % (child.get_key(), self.unbalanced.get_key()))
-            else:
-                self.callback("Performed left rotation (L-%d)" % self.unbalanced.get_key())
-            self.tree.rotate_left(self.unbalanced)
-        self._redraw_tree()
-
-        ret = self._check_tree_balance(self.unbalanced)
-        if ret:
-            self.click_lock = False
-        return ret
-
     def _redraw_tree(self):
         self.clear()
         self.tree.pre_order_tree_walk(self.tree.root, self.draw_tree)
@@ -151,7 +113,8 @@ class BinaryTreeCanvas:
             node.x = width//2
             node.y = 2*dx
         else:
-            const = dx*2**(self.tree.get_node_height(parent) - 1)
+            h = self.tree.get_node_height(parent)
+            const = dx*1.8**(h-h**.2)
             node.x = parent.x
             if parent.get_left() == node:       # node belongs to left sub-tree
                 node.x -= const
