@@ -28,48 +28,6 @@ class TreeNode:
             txt = x.get_key()
         return txt
 
-    def __eq__(self, other):
-        if other is None:
-            return False
-
-        if self.__key != other.get_key():
-            return False
-
-        # check right sub-tree
-        if self.__right is None:
-            if other.get_right() is not None:
-                return False
-        else:
-            if other.get_right() is None:
-                return False
-            if self.__right.get_key() != other.get_right().get_key():
-                return False
-
-        # check left sub-tree
-        if self.__left is None:
-            if other.get_left() is not None:
-                return False
-        else:
-            if other.get_left() is None:
-                return False
-            if self.__left.get_key() != other.get_left().get_key():
-                return False
-
-        # check parent sub-tree
-        if self.__parent is None:
-            if other.get_parent() is not None:
-                return False
-        else:
-            if other.get_parent() is None:
-                return False
-            if self.__parent.get_key() != other.get_parent().get_key():
-                return False
-
-        return True
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def set_key(self, key):
         self.__key = key
 
@@ -175,33 +133,7 @@ class BinaryTree:
         self.__root.set_color("black")
 
     def delete(self, z):
-        """
-        y = z
-        y_original_color = y.get_color()
-        if z.get_left() == BinaryTree.NIL:
-            x = z.get_right()
-            self.__rb_transplant(z, z.get_right())
-        elif z.get_right() == BinaryTree.NIL:
-            x = z.get_left()
-            self.__rb_transplant(z, z.get_left())
-        else:
-            y = self.minimum(z.get_right())
-            y_original_color = y.get_color()
-            x = y.get_right()
-            if y.get_parent() == z:
-                x.set_parent(y)
-            else:
-                self.__rb_transplant(y, y.get_right())
-                y.set_right(z.get_right())
-                y.get_right().set_parent(y)
-            self.__rb_transplant(z, y)
-            y.set_left(z.get_left())
-            y.get_left().set_parent(y)
-            y.set_color(z.get_color())
-        if y_original_color == "black":
-            self.__rb_delete_fixup(x)
 
-        """
         if (z.get_left() == BinaryTree.NIL) or (z.get_right() == BinaryTree.NIL):
             y = z
         else:
@@ -220,13 +152,14 @@ class BinaryTree:
         if y != z:
             z.set_key(y.get_key())
             print("y = [%s], z = [%s]" % (y, z))
-            self.__rb_delete_fixup(z)
         if y.get_color() == "black":
             self.__rb_delete_fixup(x)
+
         return y
 
     def __rb_transplant(self, u, v):
         if u.get_parent() == BinaryTree.NIL:
+            v.set_parent(BinaryTree.NIL)
             self.__root = v
         elif u == u.get_parent().get_left():
             u.get_parent().set_left(v)
@@ -247,11 +180,12 @@ class BinaryTree:
                 if (w.get_left().get_color() == "black") and (w.get_right().get_color() == "black"):
                     w.set_color("red")
                     x = x.get_parent()
-                elif w.get_right().get_color() == "black":
-                    w.get_left().set_color("black")
-                    w.set_color("red")
-                    self.rotate_right(w)
-                    w = x.get_parent().get_right()
+                else:
+                    if w.get_right().get_color() == "black":
+                        w.get_left().set_color("black")
+                        w.set_color("red")
+                        self.rotate_right(w)
+                        w = x.get_parent().get_right()
                     w.set_color(x.get_parent().get_color())
                     x.get_parent().set_color("black")
                     w.get_right().set_color("black")
@@ -267,11 +201,12 @@ class BinaryTree:
                 if (w.get_right().get_color() == "black") and (w.get_left().get_color() == "black"):
                     w.set_color("red")
                     x = x.get_parent()
-                elif w.get_left().get_color() == "black":
-                    w.get_right().set_color("black")
-                    w.set_color("red")
-                    self.rotate_left(w)
-                    w = x.get_parent().get_left()
+                else:
+                    if w.get_left().get_color() == "black":
+                        w.get_right().set_color("black")
+                        w.set_color("red")
+                        self.rotate_left(w)
+                        w = x.get_parent().get_left()
                     w.set_color(x.get_parent().get_color())
                     x.get_parent().set_color("black")
                     w.get_left().set_color("black")
@@ -291,7 +226,7 @@ class BinaryTree:
     def rotate_left(self, x):
         y = x.get_right()
         x.set_right(y.get_left())
-        if y.get_left() != BinaryTree.NIL:
+        if (y.get_left() != BinaryTree.NIL) and (y.get_left() is not None):
             y.get_left().set_parent(x)
         y.set_parent(x.get_parent())
         if x.get_parent() == BinaryTree.NIL:
@@ -306,7 +241,7 @@ class BinaryTree:
     def rotate_right(self, x):
         y = x.get_left()
         x.set_left(y.get_right())
-        if y.get_right() != BinaryTree.NIL:
+        if (y.get_right() != BinaryTree.NIL) and (y.get_right() is not None):
             y.get_right().set_parent(x)
         y.set_parent(x.get_parent())
         if x.get_parent() == BinaryTree.NIL:
@@ -386,7 +321,7 @@ class BinaryTree:
         return n
 
     def get_node_height(self, node):
-        if node is None:
+        if (node is None) or (node == BinaryTree.NIL):
             return -1
         else:
             return max(self.get_node_height(node.get_left()), self.get_node_height(node.get_right())) + 1

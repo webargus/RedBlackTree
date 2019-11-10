@@ -201,8 +201,8 @@ class CanvasTreeNode(rbt.TreeNode):
     FONT = ("Arial", 10)
 
     def __init__(self, key, color="red"):
-        parent = left = right = rbt.BinaryTree.NIL
-        super(CanvasTreeNode, self).__init__(key, color, parent, left, right)
+
+        super(CanvasTreeNode, self).__init__(key, color, rbt.BinaryTree.NIL, rbt.BinaryTree.NIL, rbt.BinaryTree.NIL)
         self.x = self.y = 0
 
     def __str__(self):
@@ -212,12 +212,6 @@ class CanvasTreeNode(rbt.TreeNode):
         s += "right child: %s," % self._to_string(self.get_right())
         s += "color: %s " % self.get_color()
         return s
-
-    """def __eq__(self, other):
-        return super().__eq__(other)
-
-    def __ne__(self, other):
-        return super().__ne__(other)"""
 
 
 
