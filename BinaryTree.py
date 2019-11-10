@@ -10,6 +10,18 @@ class RBTreeNode:
         self.parent = self.left = self.right = None
         self.color = RBTreeNode.RED
 
+    def delete(self):
+        """if self.parent is not None:
+            if self.is_left():
+                self.parent.left = None
+            else:
+                self.parent.right = None
+        if self.right is not None:
+            self.right.parent = None
+        if self.left is not None:
+            self.left.parent = None"""
+        self.key = self.parent = self.left = self.right = self.color = None
+
     def get_uncle(self):
         if (self.parent is None) or (self.parent.parent is None):
             return None
@@ -172,13 +184,16 @@ class BinaryTree:
 
     def get_delete_rep(self, x):
         if (x.left is not None) and (x.right is not None):
-            return self.successor(x.right)
+            y = x
+            while y.left is not None:
+                y = y.left
+            return y
         if (x.left is None) and (x.right is None):
             return None
-        if x.left is None:
-            return x.right
-        else:
+        if x.left is not None:
             return x.left
+        else:
+            return x.right
 
     def rb_delete(self, z):
         x = self.get_delete_rep(z)
@@ -186,6 +201,7 @@ class BinaryTree:
         p = z.parent
         if x is None:
             if z == self.root:
+                self.root.delete()
                 self.root = None
             else:
                 if both_black:
@@ -197,7 +213,7 @@ class BinaryTree:
                     p.left = None
                 else:
                     p.right = None
-            z = None
+            z.delete()
             return
 
         if (z.left is None) or (z.right is None):
@@ -205,13 +221,13 @@ class BinaryTree:
                 z.key = x.key
                 z.left = None
                 z.right = None
-                x = None
+                x.delete()
             else:
                 if z.is_left():
                     p.left = x
                 else:
                     p.right = x
-                z = None
+                z.delete()
                 x.parent = p
                 if both_black:
                     self.rb_fix_up_black(x)
@@ -220,13 +236,6 @@ class BinaryTree:
             return
         x.key, z.key = (z.key, x.key)
         self.rb_delete(x)
-
-    def in_order_tree_walk(self, node, callback):
-        if node is None:
-            return
-        self.in_order_tree_walk(node.left, callback)
-        callback(node)              # do something with node, like drawing it in a tkinter canvas
-        self.in_order_tree_walk(node.right, callback)
 
     def pre_order_tree_walk(self, node, callback):
         if node is None:

@@ -36,7 +36,7 @@ class Gui(Frame):
 
         ftop = Frame(frame)
         ftop.grid({"row": 0, "column": 0})
-        text = "Please, refer to code below for checking Python tree implementation"
+        text = "Please, find Python tree implementation code in listing below:"
         Label(ftop,
               border=1,
               relief=SUNKEN,
@@ -52,7 +52,7 @@ class Gui(Frame):
 
         self.nb = Notebook(self)
         #   insert tabs
-        self.nb_files = [("Red-Black Tree", Frame(self.nb), "RedBlackBinaryTree")]
+        self.nb_files = [("Red-Black Tree", Frame(self.nb), "BinaryTree")]
         for i in self.nb_files:
             self.nb.add(i[1], text="    " + i[0] + "    ")
         self.nb.grid({"row": 0, "column": 1, "sticky": NSEW})

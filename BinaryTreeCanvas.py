@@ -23,6 +23,7 @@ class BinaryTreeCanvas:
         tags = self.canvas.gettags(item)
         if (len(tags) > 1) and (tags[0] == "node"):
             node = self.tree.search(tags[1], self.tree.get_root())
+            print("handle click sel node [%s]" % str(node))
             self._select_node(node)
             txt = "Search for key %s returned node [%s]" % (tags[1], str(node))
             self.callback(txt)
@@ -84,6 +85,7 @@ class BinaryTreeCanvas:
         self.callback("Deleted node [%s]" % str(node))
 
     def _select_node(self, node):
+        print(node)
         self.canvas.coords(self.sel_rect,
                            (node.x - 1.5 * CanvasTreeNode.NODE_RADIUS,
                             node.y - 1.5 * CanvasTreeNode.NODE_RADIUS,
@@ -141,12 +143,12 @@ class BinaryTreeCanvas:
                                 fill=node.color,
                                 outline="orange")
         text = self.canvas.create_text(x,
-                                y,
-                                text=key,
-                                font=CanvasTreeNode.FONT,
-                                fill="white",
-                                activefill="yellow",
-                                tags=("node", key))
+                                       y,
+                                       text=key,
+                                       font=CanvasTreeNode.FONT,
+                                       fill="white",
+                                       activefill="yellow",
+                                       tags=("node", key))
         # draw balance factor
         parent = node.parent
         sign = 1
@@ -202,6 +204,10 @@ class CanvasTreeNode(rbt.RBTreeNode):
 
         super(CanvasTreeNode, self).__init__(key)
         self.x = self.y = 0
+
+    def delete(self):
+        self.x = self.y = None
+        super().delete()
 
     def __str__(self):
         s = "key: %s, " % self.key
