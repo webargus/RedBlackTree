@@ -19,9 +19,9 @@ class RBTreeNode:
             return self.parent.parent.left
 
     def is_left(self):
-        return self == parent.left
+        return self == self.parent.left
 
-    def sibling(self):
+    def get_sibling(self):
         if self.parent is None:
             return None
         if self.is_left():
@@ -34,8 +34,8 @@ class RBTreeNode:
                 self.parent.left = parent
             else:
                 self.parent.right = parent
-            parent.parent = self.parent
-            self.parent = parent
+        parent.parent = self.parent
+        self.parent = parent
 
     def is_child_red(self):
         b1 = (self.left is not None) and (self.left.color == RBTreeNode.RED)
@@ -83,7 +83,7 @@ class BinaryTree:
         gp = p.parent                   # gp = grand parent of x
         u = x.get_uncle()
         if p.color != RBTreeNode.BLACK:
-            if (u is not None) and (u.color == RBTreeNode.BLACK):
+            if (u is not None) and (u.color == RBTreeNode.RED):
                 p.color = RBTreeNode.BLACK
                 gp.color = RBTreeNode.RED
                 u.color = RBTreeNode.BLACK
@@ -104,6 +104,71 @@ class BinaryTree:
                         p.color, gp.color = (gp.color, p.color)
                     self.rb_left_rotate(gp)
 
+    def rb_fix_up_black(self, x):
+        if x == self.root:
+            return
+        s = x.get_sibling()
+        p = x.parent
+        if s is None:
+            self.rb_fix_up_black(p)
+        else:
+            if s.color == RBTreeNode.RED:
+                p.color = RBTreeNode.RED
+                s.color = RBTreeNode.BLACK
+                if s.is_left():
+                    self.rb_right_rotate(p)
+                else:
+                    self.rb_left_rotate(p)
+                self.rb_fix_up_black(x)
+            else:
+                if s.is_child_red():
+                    if (s.left is not None) and (s.left.color == RBTreeNode.RED):
+                        if s.is_left():
+                            s.left.color = s.color
+                            s.color = p.color
+                            self.rb_right_rotate(p)
+                        else:
+                            s.left.color = p.color
+                            self.rb_right_rotate(s)
+                            self.rb_left_rotate(p)
+                    else:
+                        if s.is_left():
+                            s.right.color = p.color
+                            self.rb_left_rotate(s)
+                            self.rb_right_rotate(p)
+                        else:
+                            s.right.color = s.color
+                            s.color = p.color
+                            self.rb_left_rotate(p)
+                    p.color = RBTreeNode.BLACK
+                else:
+                    s.color = RBTreeNode.RED
+                    if p.color == RBTreeNode.BLACK:
+                        self.rb_fix_up_black(p)
+                    else:
+                        p.color = RBTreeNode.BLACK
+
+    def insert(self, key):
+        node = RBTreeNode(key)
+        y = None
+        x = self.root
+        while x is not None:
+            y = x
+            if node.key == x.key:
+                raise ValueError
+            elif node.k < x.k:
+                x = x.left
+            else:
+                x = x.right
+        node.parent = y
+        if y is None:
+            self.root = node
+        elif node.key < y.key:
+            y.left = node
+        else:
+            y.right = node
+        self.rb_fix_up_red(node)
+
     def get_delete_rep(self, x):
         if (x.left is not None) and (x.right is not None):
             return self.successor(x.right)
@@ -116,6 +181,68 @@ class BinaryTree:
 
     def rb_delete(self, z):
         x = self.get_delete_rep(z)
+        both_black = ((x is None) or (x.color == RBTreeNode.BLACK)) and (z.color == RBTreeNode.BLACK)
+        p = z.parent
+        if x is None:
+            if z == self.root:
+                self.root = None
+            else:
+                if both_black:
+                    self.rb_fix_up_black(z)
+                else:
+                    if z.get_sibling() is not None:
+                        z.get_sibling().color = RBTreeNode.RED
+                if z.is_left():
+                    p.left = None
+                else:
+                    p.right = None
+            z = None
+            return
+
+        if (z.left is None) or (z.right is None):
+            if z == self.root:
+                z.key = x.key
+                z.left = None
+                z.right = None
+                x = None
+            else:
+                if z.is_left():
+                    p.left = x
+                else:
+                    p.right = x
+                z = None
+                x.parent = p
+                if both_black:
+                    self.rb_fix_up_black(x)
+                else:
+                    x.color = RBTreeNode.BLACK
+            return
+        x.key, z.key = (z.key, x.key)
+        self.rb_delete(x)
+
+    def in_order_tree_walk(self, node, callback):
+        if node is None:
+            return
+        self.in_order_tree_walk(node.left, callback)
+        callback(node)              # do something with node, like drawing it in a tkinter canvas
+        self.in_order_tree_walk(node.right, callback)
+
+    def pre_order_tree_walk(self, node, callback):
+        if node is None:
+            return
+        callback(node)
+        self.pre_order_tree_walk(node.left, callback)
+        self.pre_order_tree_walk(node.right, callback)
+
+    def search(self, key, node):
+        if node is None:
+            return node
+        if key == node.key:
+            return node
+        elif key < node.key:
+            return self.search(key, node.left)
+        else:
+            return self.search(key, node.right)
 
     # return maximum of subtree starting at @node
     def maximum(self, node):

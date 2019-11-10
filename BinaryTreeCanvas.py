@@ -1,6 +1,5 @@
 from tkinter import *
-import RedBlackBinaryTree as rbt
-import math
+import BinaryTree as rbt
 
 
 class BinaryTreeCanvas:
