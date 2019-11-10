@@ -22,61 +22,61 @@ class BinaryTreeCanvas:
         item = self.canvas.find_withtag("current")
         tags = self.canvas.gettags(item)
         if (len(tags) > 1) and (tags[0] == "node"):
-            node = self.tree.search(int(tags[1]), self.tree.get_root())
+            node = self.tree.search(tags[1], self.tree.get_root())
             self._select_node(node)
             txt = "Search for key %s returned node [%s]" % (tags[1], str(node))
             self.callback(txt)
 
     def maximum(self):
         root = self.tree.get_root()
-        if root == rbt.BinaryTree.NIL:
+        if root is None:
             return
         max_node = self.tree.maximum(root)
-        if max_node == rbt.BinaryTree.NIL:
+        if max_node is None:
             self.callback("There is no maximum BST key")
         else:
             self._select_node(max_node)
-            self.callback("Maximum BST key: %d" % max_node.get_key())
+            self.callback("Maximum BST key: %d" % max_node.key)
 
     def minimum(self):
         root = self.tree.get_root()
-        if root == rbt.BinaryTree.NIL:
+        if root is None:
             return
         min_node = self.tree.minimum(root)
-        if min_node == rbt.BinaryTree.NIL:
+        if min_node is None:
             self.callback("There is no minimum BST key")
         else:
             self._select_node(min_node)
-            self.callback("Minimum BST key: %d" % min_node.get_key())
+            self.callback("Minimum BST key: %d" % min_node.key)
 
     def successor(self):
         node = self.selected
         if node is None:
             return
         successor = self.tree.successor(node)
-        k = node.get_key()
-        if successor == rbt.BinaryTree.NIL:
+        k = node.key
+        if successor is None:
             self.callback("There is no successor for %d, i.e., %d is the BST maximum" % (k, k))
         else:
-            self.callback("The successor of %d is %d" % (k, successor.get_key()))
+            self.callback("The successor of %d is %d" % (k, successor.key))
 
     def predecessor(self):
         node = self.selected
         if node is None:
             return
         predecessor = self.tree.predecessor(node)
-        k = node.get_key()
-        if predecessor == rbt.BinaryTree.NIL:
+        k = node.key
+        if predecessor is None:
             self.callback("There is no predecessor for %d, i.e., %d is the BST minimum" % (k, k))
         else:
-            self.callback("The predecessor of %d is %d" % (k, predecessor.get_key()))
+            self.callback("The predecessor of %d is %d" % (k, predecessor.key))
 
     def delete(self):
         node = self.selected
         if node is None:
             return
         print("node to delete: [%s]" % node)
-        self.tree.delete(node)
+        self.tree.rb_delete(node)
         if self.is_empty():
             self.clear_tree()
         else:
@@ -112,15 +112,15 @@ class BinaryTreeCanvas:
         print(node)             # debug
         width = self.canvas.winfo_width() - 2*CanvasTreeNode.NODE_RADIUS
         dx = 2*CanvasTreeNode.NODE_RADIUS
-        parent = node.get_parent()
-        if parent == rbt.BinaryTree.NIL:                  # that's the root node
+        parent = node.parent
+        if parent is None:                  # that's the root node
             node.x = width//2
             node.y = 2*dx
         else:
             h = self.tree.get_node_height(parent)
             const = dx*1.8**(h-h**.2)
             node.x = parent.x
-            if parent.get_left() == node:       # node belongs to left sub-tree
+            if parent.left == node:       # node belongs to left sub-tree
                 node.x -= const
             else:
                 node.x += const
@@ -128,18 +128,17 @@ class BinaryTreeCanvas:
             node.y = parent.y + 4*CanvasTreeNode.NODE_RADIUS
 
         self._draw_node(node, node.x, node.y)
-        if parent == rbt.BinaryTree.NIL:
+        if parent is None:
             return
         self._draw_edge(parent, node)
 
     def _draw_node(self, node, x, y):
-        key = node.get_key()
-
+        key = node.key
         self.canvas.create_oval(x - CanvasTreeNode.NODE_RADIUS,
                                 y - CanvasTreeNode.NODE_RADIUS,
                                 x + CanvasTreeNode.NODE_RADIUS,
                                 y + CanvasTreeNode.NODE_RADIUS,
-                                fill=node.get_color(),
+                                fill=node.color,
                                 outline="orange")
         text = self.canvas.create_text(x,
                                 y,
@@ -149,10 +148,10 @@ class BinaryTreeCanvas:
                                 activefill="yellow",
                                 tags=("node", key))
         # draw balance factor
-        parent = node.get_parent()
+        parent = node.parent
         sign = 1
-        if parent != rbt.BinaryTree.NIL:
-            sign = -1 + 2*(parent.get_right() == node)
+        if parent is not None:
+            sign = -1 + 2*(parent.right == node)
         self.canvas.create_rectangle(x+.8*sign*CanvasTreeNode.NODE_RADIUS,
                                      y-2*CanvasTreeNode.NODE_RADIUS,
                                      x+2*sign*CanvasTreeNode.NODE_RADIUS,
@@ -191,28 +190,31 @@ class BinaryTreeCanvas:
         self.clear()
 
     def is_empty(self):
-        return self.tree.get_root() == rbt.BinaryTree.NIL
+        return self.tree.get_root() is None
 
 
-class CanvasTreeNode(rbt.TreeNode):
+class CanvasTreeNode(rbt.RBTreeNode):
 
     NODE_RADIUS = 12
     FONT = ("Arial", 10)
 
-    def __init__(self, key, color="red"):
+    def __init__(self, key):
 
-        super(CanvasTreeNode, self).__init__(key, color, rbt.BinaryTree.NIL, rbt.BinaryTree.NIL, rbt.BinaryTree.NIL)
+        super(CanvasTreeNode, self).__init__(key)
         self.x = self.y = 0
 
     def __str__(self):
-        s = "key: %s, " % self.get_key()
-        s += "parent: %s, " % self._to_string(self.get_parent())
-        s += "left child: %s, " % self._to_string(self.get_left())
-        s += "right child: %s," % self._to_string(self.get_right())
-        s += "color: %s " % self.get_color()
+        s = "key: %s, " % self.key
+        s += "parent: %s, " % self._to_string(self.parent)
+        s += "left child: %s, " % self._to_string(self.left)
+        s += "right child: %s, " % self._to_string(self.right)
+        s += "color: %s " % self.color
         return s
 
-
+    def _to_string(self, x):
+        if x is None:
+            return "None"
+        return "%s" % x.key
 
 
 

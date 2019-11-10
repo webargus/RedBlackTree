@@ -19,7 +19,9 @@ class RBTreeNode:
             return self.parent.parent.left
 
     def is_left(self):
-        return self == self.parent.left
+        if self.parent is not None:
+            return self == self.parent.left
+        return None
 
     def get_sibling(self):
         if self.parent is None:
@@ -29,7 +31,7 @@ class RBTreeNode:
         return self.parent.left
 
     def put_down(self, parent):
-        if parent is not None:
+        if self.parent is not None:
             if self.is_left():
                 self.parent.left = parent
             else:
@@ -148,15 +150,14 @@ class BinaryTree:
                     else:
                         p.color = RBTreeNode.BLACK
 
-    def insert(self, key):
-        node = RBTreeNode(key)
+    def insert(self, node):
         y = None
         x = self.root
         while x is not None:
             y = x
             if node.key == x.key:
                 raise ValueError
-            elif node.k < x.k:
+            elif node.key < x.key:
                 x = x.left
             else:
                 x = x.right
@@ -237,9 +238,9 @@ class BinaryTree:
     def search(self, key, node):
         if node is None:
             return node
-        if key == node.key:
+        if int(key) == int(node.key):
             return node
-        elif key < node.key:
+        elif int(key) < int(node.key):
             return self.search(key, node.left)
         else:
             return self.search(key, node.right)
