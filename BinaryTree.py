@@ -1,4 +1,15 @@
 
+"""
+UFRPE - BSI 2019.2 - Algorithms & Data Structures - prof. Tiago Espíndola
+Project Red-Black Binary Search Tree
+Author: Edson Kropniczki    -   kropniczki@gmail.com
+License: free
+Disclaimer: use it at your own risk
+References:
+    https://www.cs.purdue.edu/homes/ayg/CS251/slides/chap13c.pdf
+    Thomas Cormen & co-authors - Introduction to Algorithms - third edition
+"""
+
 
 class RBTreeNode:
 
@@ -182,21 +193,14 @@ class BinaryTree:
             y.right = node
         self.rb_fix_up_red(node)
 
-    def get_delete_rep(self, x):
-        if (x.left is not None) and (x.right is not None):
-            y = x
-            while y.left is not None:
-                y = y.left
-            return y
-        if (x.left is None) and (x.right is None):
-            return None
-        if x.left is not None:
-            return x.left
-        else:
-            return x.right
-
     def rb_delete(self, z):
-        x = self.get_delete_rep(z)
+        x = z.left
+        if x is not None:
+            x = self.maximum(x)
+        if x is None:
+            x = z.right
+            if x is not None:
+                x = self.minimum(x)
         both_black = ((x is None) or (x.color == RBTreeNode.BLACK)) and (z.color == RBTreeNode.BLACK)
         p = z.parent
         if x is None:
@@ -256,6 +260,7 @@ class BinaryTree:
 
     # return maximum of subtree starting at @node
     def maximum(self, node):
+        ret = None
         while node is not None:
             ret = node
             node = node.right
@@ -263,6 +268,7 @@ class BinaryTree:
 
     # return minimum of subtree starting at @node
     def minimum(self, node):
+        ret = None
         while node is not None:
             ret = node
             node = node.left
