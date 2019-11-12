@@ -1,6 +1,10 @@
 from tkinter import *
 import BinaryTree as rbt
 
+# TODO: find a better function to spread nodes on canvas in a more smooth way
+# TODO: include button to display graph in-order walk result
+# TODO: highlight node for successor or predecessor of selected node
+
 
 class BinaryTreeCanvas:
 
@@ -120,14 +124,14 @@ class BinaryTreeCanvas:
             node.y = 2*dx
         else:
             h = self.tree.get_node_height(parent)
-            const = dx*1.8**(h-h**.2)
+            const = dx*1.9**(h-h**.1)
             node.x = parent.x
             if parent.left == node:       # node belongs to left sub-tree
                 node.x -= const
             else:
                 node.x += const
 
-            node.y = parent.y + 4*CanvasTreeNode.NODE_RADIUS
+            node.y = parent.y + 5*CanvasTreeNode.NODE_RADIUS
 
         self._draw_node(node, node.x, node.y)
         if parent is None:

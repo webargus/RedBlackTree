@@ -8,6 +8,7 @@ Disclaimer: use it at your own risk
 References:
     https://www.cs.purdue.edu/homes/ayg/CS251/slides/chap13c.pdf
     Thomas Cormen & co-authors - Introduction to Algorithms - third edition
+    https://www.youtube.com/watch?v=v6eDztNiJwo
 """
 
 
@@ -61,11 +62,6 @@ class RBTreeNode:
                 self.parent.right = parent
         parent.parent = self.parent
         self.parent = parent
-
-    def is_child_red(self):
-        b1 = (self.left is not None) and (self.left.color == RBTreeNode.RED)
-        b2 = (self.right is not None) and (self.right.color == RBTreeNode.RED)
-        return b1 or b2
 
 
 class BinaryTree:
@@ -146,7 +142,9 @@ class BinaryTree:
                     self.rb_left_rotate(p)
                 self.rb_fix_up_black(x)
             else:
-                if s.is_child_red():
+                b1 = (s.left is not None) and (s.left.color == RBTreeNode.RED)
+                b2 = (s.right is not None) and (s.right.color == RBTreeNode.RED)
+                if b1 or b2:
                     if (s.left is not None) and (s.left.color == RBTreeNode.RED):
                         if s.is_left():
                             s.left.color = s.color
