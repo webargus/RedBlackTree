@@ -123,8 +123,11 @@ class BinaryTreeCanvas:
             node.x = width//2
             node.y = 2*dx
         else:
-            h = self.tree.get_node_height(parent)
-            const = dx*1.9**(h-h**.1)
+            if (node.left is None) and (node.right is None):
+                const = CanvasTreeNode.NODE_RADIUS
+            else:
+                h = self.tree.get_node_height(parent)
+                const = dx*1.9**(h-h**.1)
             node.x = parent.x
             if parent.left == node:       # node belongs to left sub-tree
                 node.x -= const
